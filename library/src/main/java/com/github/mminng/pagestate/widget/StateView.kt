@@ -14,6 +14,7 @@ import androidx.annotation.LayoutRes
 import com.github.mminng.pagestate.R
 import com.github.mminng.pagestate.listener.PageChangeListener
 import com.github.mminng.pagestate.listener.PageCreateListener
+import com.github.mminng.pagestate.state.State
 
 /**
  * Created by zh on 2022/12/20.
@@ -31,10 +32,12 @@ internal class StateView @JvmOverloads constructor(
     private val loadingViewStub: ViewStub = ViewStub(context)
     private val emptyViewStub: ViewStub = ViewStub(context)
     private val errorViewStub: ViewStub = ViewStub(context)
+    private val customViewStub: ViewStub = ViewStub(context)
     private var _contentView: View? = null
     private var _loadingView: View? = null
     private var _emptyView: View? = null
     private var _errorView: View? = null
+    private var _customView: View? = null
 
     private var _emptyLayoutId: Int = 0
     private var _emptyIconId: Int = 0
@@ -49,6 +52,7 @@ internal class StateView @JvmOverloads constructor(
     private var _pageChangeListener: PageChangeListener? = null
     private var _reloadListener: (() -> Unit)? = null
 
+    private var _hasCustom: Boolean = false
     private var _done: Boolean = false
 
     fun setContentView(contentView: View) {
@@ -88,128 +92,92 @@ internal class StateView @JvmOverloads constructor(
         addView(errorViewStub)
     }
 
+    fun setCustomLayout(@LayoutRes layoutId: Int) {
+        if (layoutId > 0) {
+            customViewStub.layoutResource = layoutId
+            addView(customViewStub)
+            _hasCustom = true
+        }
+    }
+
     fun showLoading() {
-        if (contains(_loadingView) || _done) return
-
-        val emptyView: Pair<Boolean, Int> = containsAndPosition(_emptyView)
-        if (emptyView.first) {
-            removeViewAt(emptyView.second)
-            _pageChangeListener?.onPageEmptyChanged(false, _emptyView!!)
+        if (_done || contains(_loadingView)) return
+        if (removePage(_emptyView)) {
+            _pageChangeListener?.onPageEmptyChanged(false, _emptyView)
         }
-
-        val errorView: Pair<Boolean, Int> = containsAndPosition(_errorView)
-        if (errorView.first) {
-            removeViewAt(errorView.second)
-            _pageChangeListener?.onPageErrorChanged(false, _errorView!!)
+        if (removePage(_errorView)) {
+            _pageChangeListener?.onPageErrorChanged(false, _errorView)
         }
-
-        if (loadingViewStub.parent != null) {
-            _loadingView = loadingViewStub.inflate()
-            _pageCreateListener?.onPageLoadingCreated(_loadingView!!)
-        } else {
+        if (!inflatePage(State.LOADING)) {
             addView(_loadingView)
         }
-        _pageChangeListener?.onPageLoadingChanged(true, _loadingView!!)
+        _pageChangeListener?.onPageLoadingChanged(true, _loadingView)
     }
 
     fun showContent() {
         if (_done) return
-
-        val loadingView: Pair<Boolean, Int> = containsAndPosition(_loadingView)
-        if (loadingView.first) {
-            removeViewAt(loadingView.second)
-            _pageChangeListener?.onPageLoadingChanged(false, _loadingView!!)
+        if (removePage(_loadingView)) {
+            _pageChangeListener?.onPageLoadingChanged(false, _loadingView)
         }
-
-        val emptyView: Pair<Boolean, Int> = containsAndPosition(_emptyView)
-        if (emptyView.first) {
-            removeViewAt(emptyView.second)
-            _pageChangeListener?.onPageEmptyChanged(false, _emptyView!!)
+        if (removePage(_emptyView)) {
+            _pageChangeListener?.onPageEmptyChanged(false, _emptyView)
         }
-
-        val errorView: Pair<Boolean, Int> = containsAndPosition(_errorView)
-        if (errorView.first) {
-            removeViewAt(errorView.second)
-            _pageChangeListener?.onPageErrorChanged(false, _errorView!!)
+        if (removePage(_errorView)) {
+            _pageChangeListener?.onPageErrorChanged(false, _errorView)
         }
-
         addView(_contentView)
         _done = true
+        background = null
         _pageChangeListener = null
         _pageCreateListener = null
         _reloadListener = null
     }
 
     fun showEmpty(message: String, @DrawableRes iconResId: Int) {
-        if (contains(_emptyView) || _done) return
-
-        val loadingView: Pair<Boolean, Int> = containsAndPosition(_loadingView)
-        if (loadingView.first) {
-            removeViewAt(loadingView.second)
-            _pageChangeListener?.onPageLoadingChanged(false, _loadingView!!)
+        if (_done || contains(_emptyView)) return
+        if (removePage(_loadingView)) {
+            _pageChangeListener?.onPageLoadingChanged(false, _loadingView)
         }
-
-        val errorView: Pair<Boolean, Int> = containsAndPosition(_errorView)
-        if (errorView.first) {
-            removeViewAt(errorView.second)
-            _pageChangeListener?.onPageErrorChanged(false, _errorView!!)
+        if (removePage(_errorView)) {
+            _pageChangeListener?.onPageErrorChanged(false, _errorView)
         }
-
-        if (emptyViewStub.parent != null) {
-            _emptyView = emptyViewStub.inflate()
-            if (_emptyLayoutId == DEFAULT_EMPTY_LAYOUT) {
-                invokeReload(_emptyView!!, R.id.state_empty_btn)
-            } else {
-                invokeReload(_emptyView!!, _emptyClickId)
-            }
-            _pageCreateListener?.onPageEmptyCreated(_emptyView!!)
-        } else {
+        if (!inflatePage(State.EMPTY)) {
             addView(_emptyView)
         }
-        if (_emptyLayoutId == DEFAULT_EMPTY_LAYOUT) {
-            setPageIcon(_emptyView!!, R.id.state_empty_icon, iconResId)
-            setPageMessage(_emptyView!!, R.id.state_empty_text, message)
-        } else {
-            setPageIcon(_emptyView!!, _emptyIconId, iconResId)
-            setPageMessage(_emptyView!!, _emptyTextId, message)
-        }
-        _pageChangeListener?.onPageEmptyChanged(true, _emptyView!!)
+        setPage(State.EMPTY, message, iconResId)
+        _pageChangeListener?.onPageEmptyChanged(true, _emptyView)
     }
 
     fun showError(message: String, @DrawableRes iconResId: Int) {
-        if (contains(_errorView) || _done) return
-
-        val loadingView: Pair<Boolean, Int> = containsAndPosition(_loadingView)
-        if (loadingView.first) {
-            removeViewAt(loadingView.second)
-            _pageChangeListener?.onPageLoadingChanged(false, _loadingView!!)
+        if (_done || contains(_errorView)) return
+        if (removePage(_loadingView)) {
+            _pageChangeListener?.onPageLoadingChanged(false, _loadingView)
         }
-
-        val emptyView: Pair<Boolean, Int> = containsAndPosition(_emptyView)
-        if (emptyView.first) {
-            removeViewAt(emptyView.second)
-            _pageChangeListener?.onPageEmptyChanged(false, _emptyView!!)
+        if (removePage(_emptyView)) {
+            _pageChangeListener?.onPageEmptyChanged(false, _emptyView)
         }
-
-        if (errorViewStub.parent != null) {
-            _errorView = errorViewStub.inflate()
-            if (_errorLayoutId == DEFAULT_ERROR_LAYOUT) {
-                invokeReload(_errorView!!, R.id.state_error_btn)
-            } else {
-                invokeReload(_errorView!!, _errorClickId)
-            }
-            _pageCreateListener?.onPageErrorCreated(_errorView!!)
-        } else {
+        if (!inflatePage(State.ERROR)) {
             addView(_errorView)
         }
-        if (_errorLayoutId == DEFAULT_EMPTY_LAYOUT) {
-            setPageIcon(_errorView!!, R.id.state_error_icon, iconResId)
-            setPageMessage(_errorView!!, R.id.state_error_text, message)
-        } else {
-            setPageIcon(_errorView!!, _errorIconId, iconResId)
-            setPageMessage(_errorView!!, _errorTextId, message)
+        setPage(State.ERROR, message, iconResId)
+        _pageChangeListener?.onPageErrorChanged(true, _errorView)
+    }
+
+    fun showCustom() {
+        if (!_hasCustom || _done || contains(_customView)) return
+        if (removePage(_loadingView)) {
+            _pageChangeListener?.onPageLoadingChanged(false, _loadingView)
         }
-        _pageChangeListener?.onPageErrorChanged(true, _errorView!!)
+        if (removePage(_emptyView)) {
+            _pageChangeListener?.onPageEmptyChanged(false, _emptyView)
+        }
+        if (removePage(_errorView)) {
+            _pageChangeListener?.onPageErrorChanged(false, _errorView)
+        }
+        if (!inflatePage(State.CUSTOM)) {
+            addView(_customView)
+        }
+        _pageChangeListener?.onPageCustomChanged(true, _customView)
     }
 
     fun setPageCreateListener(listener: PageCreateListener.() -> Unit) {
@@ -232,19 +200,89 @@ internal class StateView @JvmOverloads constructor(
         setBackgroundResource(resId)
     }
 
-    private fun contains(view: View?): Boolean {
-        if (view == null) return false
-        return indexOfChild(view) >= 0
+    private fun inflatePage(state: State): Boolean {
+        when (state) {
+            State.LOADING -> {
+                return if (loadingViewStub.parent != null) {
+                    _loadingView = loadingViewStub.inflate()
+                    _pageCreateListener?.onPageLoadingCreated(_loadingView)
+                    true
+                } else {
+                    false
+                }
+            }
+            State.EMPTY -> {
+                return if (emptyViewStub.parent != null) {
+                    _emptyView = emptyViewStub.inflate()
+                    if (_emptyLayoutId == DEFAULT_EMPTY_LAYOUT) {
+                        invokeReload(_emptyView, R.id.state_empty_btn)
+                    } else {
+                        invokeReload(_emptyView, _emptyClickId)
+                    }
+                    _pageCreateListener?.onPageEmptyCreated(_emptyView)
+                    true
+                } else {
+                    false
+                }
+            }
+            State.ERROR -> {
+                return if (errorViewStub.parent != null) {
+                    _errorView = errorViewStub.inflate()
+                    if (_errorLayoutId == DEFAULT_ERROR_LAYOUT) {
+                        invokeReload(_errorView, R.id.state_error_btn)
+                    } else {
+                        invokeReload(_errorView, _errorClickId)
+                    }
+                    _pageCreateListener?.onPageErrorCreated(_errorView)
+                    true
+                } else {
+                    false
+                }
+            }
+            State.CUSTOM -> {
+                return if (customViewStub.parent != null) {
+                    _customView = customViewStub.inflate()
+                    _pageCreateListener?.onPageCustomCreated(_customView)
+                    true
+                } else {
+                    false
+                }
+            }
+        }
     }
 
-    private fun containsAndPosition(view: View?): Pair<Boolean, Int> {
-        if (view == null) return Pair.create(false, -1)
-        val index: Int = indexOfChild(view)
-        return Pair.create(index >= 0, index)
+    private fun removePage(view: View?): Boolean {
+        val pair: Pair<Boolean, Int> = containsAndPosition(view)
+        return if (pair.first) {
+            removeViewAt(pair.second)
+            true
+        } else {
+            false
+        }
     }
 
-    private fun setPageIcon(view: View, @IdRes viewId: Int, @DrawableRes iconId: Int) {
-        if (viewId > 0 && iconId > 0) {
+    private fun setPage(state: State, message: String, @DrawableRes iconResId: Int) {
+        if (state == State.EMPTY) {
+            if (_emptyLayoutId == DEFAULT_EMPTY_LAYOUT) {
+                setPageIcon(_emptyView, R.id.state_empty_icon, iconResId)
+                setPageMessage(_emptyView, R.id.state_empty_text, message)
+            } else {
+                setPageIcon(_emptyView, _emptyIconId, iconResId)
+                setPageMessage(_emptyView, _emptyTextId, message)
+            }
+        } else if (state == State.ERROR) {
+            if (_errorLayoutId == DEFAULT_ERROR_LAYOUT) {
+                setPageIcon(_errorView, R.id.state_error_icon, iconResId)
+                setPageMessage(_errorView, R.id.state_error_text, message)
+            } else {
+                setPageIcon(_errorView, _errorIconId, iconResId)
+                setPageMessage(_errorView, _errorTextId, message)
+            }
+        }
+    }
+
+    private fun setPageIcon(view: View?, @IdRes viewId: Int, @DrawableRes iconId: Int) {
+        if (view != null && viewId > 0 && iconId > 0) {
             val imageView: View = view.findViewById(viewId)
             if (imageView is ImageView) {
                 imageView.setImageResource(iconId)
@@ -252,8 +290,8 @@ internal class StateView @JvmOverloads constructor(
         }
     }
 
-    private fun setPageMessage(view: View, @IdRes viewId: Int, message: String) {
-        if (viewId > 0 && message.isNotEmpty()) {
+    private fun setPageMessage(view: View?, @IdRes viewId: Int, message: String) {
+        if (view != null && viewId > 0 && message.isNotBlank()) {
             val textView: View = view.findViewById(viewId)
             if (textView is TextView) {
                 textView.text = message
@@ -261,12 +299,23 @@ internal class StateView @JvmOverloads constructor(
         }
     }
 
-    private fun invokeReload(view: View, @IdRes viewId: Int) {
-        if (viewId > 0) {
+    private fun invokeReload(view: View?, @IdRes viewId: Int) {
+        if (view != null && viewId > 0) {
             view.findViewById<View>(viewId).setOnClickListener {
                 _reloadListener?.invoke()
             }
         }
+    }
+
+    private fun contains(view: View?): Boolean =
+        if (view == null) false
+        else indexOfChild(view) >= 0
+
+
+    private fun containsAndPosition(view: View?): Pair<Boolean, Int> {
+        if (view == null) return Pair.create(false, -1)
+        val index: Int = indexOfChild(view)
+        return Pair.create(index >= 0, index)
     }
 
     override fun onDetachedFromWindow() {

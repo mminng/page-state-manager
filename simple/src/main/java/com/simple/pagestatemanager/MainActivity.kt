@@ -17,19 +17,32 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         pageStateManager = PageStateManager.Builder(this)
+            .setLoadingLayout(R.layout.state_loading)
             .setEmptyLayout(R.layout.state_empty, R.id.empty_icon, R.id.empty_text, R.id.empty_refresh)
             .setErrorLayout(R.layout.state_error, R.id.error_icon, R.id.error_text, R.id.error_refresh)
-            .setPageChangeListener {
-                pageLoadingChanged { visible, view ->
-                    Log.w("wtf", "LoadingVisible=$visible")
-                }
-                pageEmptyChanged { visible, view ->
-                    Log.w("wtf", "EmptyVisible=$visible")
-                }
-                pageErrorChanged { visible, view ->
-                    Log.w("wtf", "ErrorVisible=$visible")
-                }
-            }.build()
+//            .setPageCreateListener {
+//                pageLoadingCreated {
+//                    Log.e("wtf", "Loading")
+//                }
+//                pageEmptyCreated {
+//                    Log.e("wtf", "Empty")
+//                }
+//                pageErrorCreated {
+//                    Log.e("wtf", "Error")
+//                }
+//            }
+//            .setPageChangeListener {
+//                pageLoadingChanged { visible, view ->
+//                    Log.w("wtf", "LoadingVisible=$visible")
+//                }
+//                pageEmptyChanged { visible, view ->
+//                    Log.w("wtf", "EmptyVisible=$visible")
+//                }
+//                pageErrorChanged { visible, view ->
+//                    Log.w("wtf", "ErrorVisible=$visible")
+//                }
+//            }
+            .build()
 
         pageStateManager.setReloadListener {
             Toast.makeText(this@MainActivity, "Reload", Toast.LENGTH_SHORT).show()
@@ -64,7 +77,8 @@ class MainActivity : AppCompatActivity() {
                 pageStateManager.showEmpty("EMPTY", R.drawable.ic_launcher_background)
             }
             R.id.error -> {
-                pageStateManager.showError("ERROR", R.drawable.ic_launcher_background)
+//                pageStateManager.showError("ERROR", R.drawable.ic_launcher_background)
+                pageStateManager.showCustom()
             }
             else -> {
             }

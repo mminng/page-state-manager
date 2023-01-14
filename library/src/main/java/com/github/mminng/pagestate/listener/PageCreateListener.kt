@@ -10,17 +10,22 @@ class PageCreateListener : OnPageCreateListener {
     private var _pageLoadingCreated: ((view: View) -> Unit)? = null
     private var _pageEmptyCreated: ((view: View) -> Unit)? = null
     private var _pageErrorCreated: ((view: View) -> Unit)? = null
+    private var _pageCustomCreated: ((view: View) -> Unit)? = null
 
-    override fun onPageLoadingCreated(view: View) {
-        _pageLoadingCreated?.invoke(view)
+    override fun onPageLoadingCreated(view: View?) {
+        view?.let { _pageLoadingCreated?.invoke(it) }
     }
 
-    override fun onPageEmptyCreated(view: View) {
-        _pageEmptyCreated?.invoke(view)
+    override fun onPageEmptyCreated(view: View?) {
+        view?.let { _pageEmptyCreated?.invoke(it) }
     }
 
-    override fun onPageErrorCreated(view: View) {
-        _pageErrorCreated?.invoke(view)
+    override fun onPageErrorCreated(view: View?) {
+        view?.let { _pageErrorCreated?.invoke(it) }
+    }
+
+    override fun onPageCustomCreated(view: View?) {
+        view?.let { _pageCustomCreated?.invoke(view) }
     }
 
     fun pageLoadingCreated(listener: (view: View) -> Unit) {
@@ -34,13 +39,19 @@ class PageCreateListener : OnPageCreateListener {
     fun pageErrorCreated(listener: (view: View) -> Unit) {
         _pageErrorCreated = listener
     }
+
+    fun pageCustomCreated(listener: (view: View) -> Unit) {
+        _pageCustomCreated = listener
+    }
 }
 
 interface OnPageCreateListener {
 
-    fun onPageLoadingCreated(view: View)
+    fun onPageLoadingCreated(view: View?)
 
-    fun onPageEmptyCreated(view: View)
+    fun onPageEmptyCreated(view: View?)
 
-    fun onPageErrorCreated(view: View)
+    fun onPageErrorCreated(view: View?)
+
+    fun onPageCustomCreated(view: View?)
 }
