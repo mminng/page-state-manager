@@ -10,7 +10,7 @@
         android:id="@+id/state_empty_icon"
         android:layout_width="78dp"
         android:layout_height="78dp"
-        android:src="@drawable/ic_empty"
+        android:src="@drawable/ic_default_page_state_empty"
         tools:ignore="ContentDescription" />
 
     <TextView
@@ -18,7 +18,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:text="@string/empty"
+        android:text="@string/default_page_state_empty"
         android:textColor="#999999"
         android:textSize="14sp" />
 
@@ -27,13 +27,13 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="15dp"
-        android:background="@drawable/solid_background"
+        android:background="@drawable/solid_default_page_state_refresh"
         android:elevation="1dp"
         android:paddingStart="16dp"
         android:paddingTop="6dp"
         android:paddingEnd="16dp"
         android:paddingBottom="6dp"
-        android:text="@string/refresh"
+        android:text="@string/default_page_state_refresh"
         android:textColor="#666666"
         android:textSize="14sp" />
 </LinearLayout>

@@ -76,12 +76,18 @@ class PageStateManager constructor(builder: Builder) {
 
     private fun buildRootView(target: Any): ViewGroup =
         when (target) {
-            is Activity -> target.findViewById(android.R.id.content)
-            is Fragment -> target.view?.parent as ViewGroup
-            is View -> if (target.parent != null) {
-                target.parent as ViewGroup
-            } else {
-                throw IllegalArgumentException("The parent this view can't null.")
+            is Activity -> {
+                target.findViewById(android.R.id.content)
+            }
+            is Fragment -> {
+                target.view?.parent as ViewGroup
+            }
+            is View -> {
+                if (target.parent != null) {
+                    target.parent as ViewGroup
+                } else {
+                    throw IllegalArgumentException("The parent this view can't null.")
+                }
             }
             else -> throw IllegalArgumentException("The target type must be Fragment or Activity or View.")
         }
@@ -148,7 +154,7 @@ class PageStateManager constructor(builder: Builder) {
             errorClickId = clickId
         }
 
-        fun setCustomLayout(@LayoutRes layoutId: Int) {
+        fun setCustomLayout(@LayoutRes layoutId: Int) = apply {
             customLayout = layoutId
         }
 

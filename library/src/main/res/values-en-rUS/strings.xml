@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="empty">No data</string>
-    <string name="error">Error</string>
-    <string name="refresh">Refresh</string>
+    <string name="default_page_state_empty">No data</string>
+    <string name="default_page_state_error">Error</string>
+    <string name="default_page_state_refresh">Refresh</string>
 </resources>

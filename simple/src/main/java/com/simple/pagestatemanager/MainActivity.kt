@@ -1,88 +1,25 @@
 package com.simple.pagestatemanager
 
+import android.content.Intent
 import android.os.Bundle
-import android.os.Handler
-import android.util.Log
-import android.view.Menu
-import android.view.MenuItem
-import android.widget.Toast
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
-import com.github.mminng.pagestate.PageStateManager
+import com.simple.pagestatemanager.defaultpage.activity.DefaultActivity
+import com.simple.pagestatemanager.defaultpage.fragment.DefaultFragmentActivity
 
+/**
+ * Created by zh on 2023/1/15.
+ */
 class MainActivity : AppCompatActivity() {
-
-    private lateinit var pageStateManager: PageStateManager
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        pageStateManager = PageStateManager.Builder(this)
-            .setLoadingLayout(R.layout.state_loading)
-            .setEmptyLayout(R.layout.state_empty, R.id.empty_icon, R.id.empty_text, R.id.empty_refresh)
-            .setErrorLayout(R.layout.state_error, R.id.error_icon, R.id.error_text, R.id.error_refresh)
-//            .setPageCreateListener {
-//                pageLoadingCreated {
-//                    Log.e("wtf", "Loading")
-//                }
-//                pageEmptyCreated {
-//                    Log.e("wtf", "Empty")
-//                }
-//                pageErrorCreated {
-//                    Log.e("wtf", "Error")
-//                }
-//            }
-//            .setPageChangeListener {
-//                pageLoadingChanged { visible, view ->
-//                    Log.w("wtf", "LoadingVisible=$visible")
-//                }
-//                pageEmptyChanged { visible, view ->
-//                    Log.w("wtf", "EmptyVisible=$visible")
-//                }
-//                pageErrorChanged { visible, view ->
-//                    Log.w("wtf", "ErrorVisible=$visible")
-//                }
-//            }
-            .build()
-
-        pageStateManager.setReloadListener {
-            Toast.makeText(this@MainActivity, "Reload", Toast.LENGTH_SHORT).show()
+        findViewById<View>(R.id.open_default_activity).setOnClickListener {
+            startActivity(Intent(this@MainActivity, DefaultActivity::class.java))
         }
-
-        pageStateManager.showLoading()
-        Handler().postDelayed({
-            pageStateManager.showError()
-//            Handler().postDelayed({
-//                pageStateManager.showLoading()
-//                Handler().postDelayed({
-//                    pageStateManager.showEmpty()
-//                }, 3000)
-//            }, 3000)
-        }, 3000)
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.menu_page_state, menu)
-        return super.onCreateOptionsMenu(menu)
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.loading -> {
-                pageStateManager.showLoading()
-            }
-            R.id.content -> {
-                pageStateManager.showContent()
-            }
-            R.id.empty -> {
-                pageStateManager.showEmpty("EMPTY", R.drawable.ic_launcher_background)
-            }
-            R.id.error -> {
-//                pageStateManager.showError("ERROR", R.drawable.ic_launcher_background)
-                pageStateManager.showCustom()
-            }
-            else -> {
-            }
+        findViewById<View>(R.id.open_default_fragment).setOnClickListener {
+            startActivity(Intent(this@MainActivity, DefaultFragmentActivity::class.java))
         }
-        return super.onOptionsItemSelected(item)
+        findViewById<View>(R.id.open_custom).setOnClickListener { }
     }
 }

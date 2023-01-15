@@ -11,11 +11,11 @@
         android:id="@+id/empty_icon"
         android:layout_width="88dp"
         android:layout_height="88dp"
-        android:src="@drawable/ic_empty" />
+        android:src="@drawable/ic_default_page_state_empty" />
 
     <TextView
         android:id="@+id/empty_text"
-        android:text="@string/empty"
+        android:text="empty"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="16sp"

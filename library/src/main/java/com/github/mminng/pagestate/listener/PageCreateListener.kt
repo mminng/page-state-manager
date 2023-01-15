@@ -25,7 +25,7 @@ class PageCreateListener : OnPageCreateListener {
     }
 
     override fun onPageCustomCreated(view: View?) {
-        view?.let { _pageCustomCreated?.invoke(view) }
+        view?.let { _pageCustomCreated?.invoke(it) }
     }
 
     fun pageLoadingCreated(listener: (view: View) -> Unit) {

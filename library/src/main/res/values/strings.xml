@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="empty">没有数据</string>
-    <string name="error">加载失败</string>
-    <string name="refresh">刷新</string>
+    <string name="default_page_state_empty">没有数据</string>
+    <string name="default_page_state_error">加载失败</string>
+    <string name="default_page_state_refresh">刷新</string>
 </resources>

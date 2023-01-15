@@ -1,18 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:gravity="center"
     android:orientation="vertical">
 
-    <FrameLayout
-        android:id="@+id/content_layout"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
+    <Button
+        android:id="@+id/open_default_activity"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Default(On Activity)"
+        android:textAllCaps="false" />
 
-        <RatingBar
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:rating="5" />
-    </FrameLayout>
+    <Button
+        android:id="@+id/open_default_fragment"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:text="Default(On Fragment)"
+        android:textAllCaps="false" />
+
+    <Button
+        android:id="@+id/open_custom"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:text="Custom"
+        android:textAllCaps="false"
+        app:layout_constraintTop_toTopOf="@+id/guideline2" />
+
 </LinearLayout>

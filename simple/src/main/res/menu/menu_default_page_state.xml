@@ -13,4 +13,10 @@
     <item
         android:id="@+id/error"
         android:title="Error" />
+    <item
+        android:id="@+id/empty_change"
+        android:title="Empty(Change icon and text)" />
+    <item
+        android:id="@+id/error_change"
+        android:title="Error(Change icon and text)" />
 </menu>

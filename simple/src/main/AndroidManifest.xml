@@ -25,6 +25,9 @@
                 android:name="android.app.lib_name"
                 android:value="" />
         </activity>
+        <activity android:name="com.simple.pagestatemanager.defaultpage.activity.DefaultActivity" />
+        <activity android:name="com.simple.pagestatemanager.defaultpage.fragment.DefaultFragmentActivity" />
+
     </application>
 
 </manifest>

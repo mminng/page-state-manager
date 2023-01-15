@@ -93,7 +93,7 @@ internal class StateView @JvmOverloads constructor(
     }
 
     fun setCustomLayout(@LayoutRes layoutId: Int) {
-        if (layoutId > 0) {
+        if (layoutId != 0) {
             customViewStub.layoutResource = layoutId
             addView(customViewStub)
             _hasCustom = true
@@ -107,6 +107,9 @@ internal class StateView @JvmOverloads constructor(
         }
         if (removePage(_errorView)) {
             _pageChangeListener?.onPageErrorChanged(false, _errorView)
+        }
+        if (_hasCustom && removePage(_customView)) {
+            _pageChangeListener?.onPageCustomChanged(false, _customView)
         }
         if (!inflatePage(State.LOADING)) {
             addView(_loadingView)
@@ -125,6 +128,9 @@ internal class StateView @JvmOverloads constructor(
         if (removePage(_errorView)) {
             _pageChangeListener?.onPageErrorChanged(false, _errorView)
         }
+        if (_hasCustom && removePage(_customView)) {
+            _pageChangeListener?.onPageCustomChanged(false, _customView)
+        }
         addView(_contentView)
         _done = true
         background = null
@@ -141,6 +147,9 @@ internal class StateView @JvmOverloads constructor(
         if (removePage(_errorView)) {
             _pageChangeListener?.onPageErrorChanged(false, _errorView)
         }
+        if (_hasCustom && removePage(_customView)) {
+            _pageChangeListener?.onPageCustomChanged(false, _customView)
+        }
         if (!inflatePage(State.EMPTY)) {
             addView(_emptyView)
         }
@@ -155,6 +164,9 @@ internal class StateView @JvmOverloads constructor(
         }
         if (removePage(_emptyView)) {
             _pageChangeListener?.onPageEmptyChanged(false, _emptyView)
+        }
+        if (_hasCustom && removePage(_customView)) {
+            _pageChangeListener?.onPageCustomChanged(false, _customView)
         }
         if (!inflatePage(State.ERROR)) {
             addView(_errorView)
@@ -282,7 +294,7 @@ internal class StateView @JvmOverloads constructor(
     }
 
     private fun setPageIcon(view: View?, @IdRes viewId: Int, @DrawableRes iconId: Int) {
-        if (view != null && viewId > 0 && iconId > 0) {
+        if (view != null && viewId != 0 && iconId != 0) {
             val imageView: View = view.findViewById(viewId)
             if (imageView is ImageView) {
                 imageView.setImageResource(iconId)
@@ -291,7 +303,7 @@ internal class StateView @JvmOverloads constructor(
     }
 
     private fun setPageMessage(view: View?, @IdRes viewId: Int, message: String) {
-        if (view != null && viewId > 0 && message.isNotBlank()) {
+        if (view != null && viewId != 0 && message.isNotBlank()) {
             val textView: View = view.findViewById(viewId)
             if (textView is TextView) {
                 textView.text = message
@@ -300,7 +312,7 @@ internal class StateView @JvmOverloads constructor(
     }
 
     private fun invokeReload(view: View?, @IdRes viewId: Int) {
-        if (view != null && viewId > 0) {
+        if (view != null && viewId != 0) {
             view.findViewById<View>(viewId).setOnClickListener {
                 _reloadListener?.invoke()
             }
