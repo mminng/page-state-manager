@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Context
 import android.view.View
 import android.view.ViewGroup
+import android.view.Window
 import androidx.annotation.DrawableRes
 import androidx.annotation.IdRes
 import androidx.annotation.LayoutRes
@@ -77,7 +78,7 @@ class PageStateManager constructor(builder: Builder) {
     private fun buildRootView(target: Any): ViewGroup =
         when (target) {
             is Activity -> {
-                target.findViewById(android.R.id.content)
+                target.findViewById(Window.ID_ANDROID_CONTENT)
             }
             is Fragment -> {
                 target.view?.parent as ViewGroup
