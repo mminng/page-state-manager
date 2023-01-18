@@ -54,6 +54,7 @@ internal class StateView @JvmOverloads constructor(
 
     private var _hasCustom: Boolean = false
     private var _done: Boolean = false
+    private var isFragmentTarget: Boolean = false
 
     fun setContentView(contentView: View) {
         _contentView = contentView
@@ -102,6 +103,9 @@ internal class StateView @JvmOverloads constructor(
 
     fun showLoading() {
         if (_done || contains(_loadingView)) return
+        if (isFragmentTarget) {
+            _contentView?.visibility = INVISIBLE
+        }
         if (removePage(_emptyView)) {
             _pageChangeListener?.onPageEmptyChanged(false, _emptyView)
         }
@@ -131,7 +135,11 @@ internal class StateView @JvmOverloads constructor(
         if (_hasCustom && removePage(_customView)) {
             _pageChangeListener?.onPageCustomChanged(false, _customView)
         }
-        addView(_contentView)
+        if (isFragmentTarget) {
+            _contentView?.visibility = VISIBLE
+        } else {
+            addView(_contentView)
+        }
         _done = true
         background = null
         _pageChangeListener = null
@@ -141,6 +149,9 @@ internal class StateView @JvmOverloads constructor(
 
     fun showEmpty(message: String, @DrawableRes iconResId: Int) {
         if (_done || contains(_emptyView)) return
+        if (isFragmentTarget) {
+            _contentView?.visibility = INVISIBLE
+        }
         if (removePage(_loadingView)) {
             _pageChangeListener?.onPageLoadingChanged(false, _loadingView)
         }
@@ -159,6 +170,9 @@ internal class StateView @JvmOverloads constructor(
 
     fun showError(message: String, @DrawableRes iconResId: Int) {
         if (_done || contains(_errorView)) return
+        if (isFragmentTarget) {
+            _contentView?.visibility = INVISIBLE
+        }
         if (removePage(_loadingView)) {
             _pageChangeListener?.onPageLoadingChanged(false, _loadingView)
         }
@@ -177,6 +191,9 @@ internal class StateView @JvmOverloads constructor(
 
     fun showCustom() {
         if (!_hasCustom || _done || contains(_customView)) return
+        if (isFragmentTarget) {
+            _contentView?.visibility = INVISIBLE
+        }
         if (removePage(_loadingView)) {
             _pageChangeListener?.onPageLoadingChanged(false, _loadingView)
         }
@@ -206,6 +223,10 @@ internal class StateView @JvmOverloads constructor(
 
     fun setReloadListener(listener: () -> Unit) {
         _reloadListener = listener
+    }
+
+    fun isFragmentTarget(isFragmentTarget: Boolean) {
+        this.isFragmentTarget = isFragmentTarget
     }
 
     fun setBackground(@DrawableRes resId: Int) {

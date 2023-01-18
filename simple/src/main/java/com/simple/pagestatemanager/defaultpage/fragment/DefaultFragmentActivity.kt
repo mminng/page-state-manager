@@ -9,7 +9,7 @@ import com.simple.pagestatemanager.R
 
 class DefaultFragmentActivity : AppCompatActivity() {
 
-    private val fragment: DefaultFragment = DefaultFragment()
+    private lateinit var fragment: DefaultFragment
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -19,9 +19,14 @@ class DefaultFragmentActivity : AppCompatActivity() {
             actionBar.title = "Default(On Fragment)"
             actionBar.setDisplayHomeAsUpEnabled(true)
         }
-        val ft: FragmentTransaction = supportFragmentManager.beginTransaction()
-        ft.add(R.id.fragment_content, fragment)
-        ft.commit()
+        if (supportFragmentManager.findFragmentById(R.id.fragment_content) == null) {
+            val ft: FragmentTransaction = supportFragmentManager.beginTransaction()
+            fragment = DefaultFragment()
+            ft.add(R.id.fragment_content, fragment)
+            ft.commit()
+        } else {
+            fragment = supportFragmentManager.findFragmentById(R.id.fragment_content) as DefaultFragment
+        }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

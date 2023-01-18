@@ -27,7 +27,7 @@ class PageStateManager constructor(builder: Builder) {
         val index: Int = rootView.indexOfChild(contentView)
         rootView.removeView(contentView)
         _stateView = StateView(context)
-        rootView.addView(_stateView, index, contentView.layoutParams)
+        _stateView.isFragmentTarget(builder.target is Fragment)
         _stateView.setContentView(contentView)
         _stateView.setLoadingView(builder.loadingLayout)
         _stateView.setEmptyView(
@@ -45,6 +45,7 @@ class PageStateManager constructor(builder: Builder) {
         _stateView.setCustomLayout(builder.customLayout)
         builder.pageCreateListener?.let { _stateView.setPageCreateListener(it) }
         builder.pageChangeListener?.let { _stateView.setPageChangeListener(it) }
+        rootView.addView(_stateView, index, contentView.layoutParams)
     }
 
     fun showLoading() {
@@ -81,7 +82,7 @@ class PageStateManager constructor(builder: Builder) {
                 target.findViewById(Window.ID_ANDROID_CONTENT)
             }
             is Fragment -> {
-                target.view?.parent as ViewGroup
+                target.requireView().parent as ViewGroup
             }
             is View -> {
                 if (target.parent != null) {
@@ -93,11 +94,11 @@ class PageStateManager constructor(builder: Builder) {
             else -> throw IllegalArgumentException("The target type must be Fragment or Activity or View.")
         }
 
-    private fun buildContentView(target: Any, parentView: ViewGroup): View =
+    private fun buildContentView(target: Any, rootView: ViewGroup): View =
         if (target is View) {
             target
         } else {
-            parentView.getChildAt(0)
+            rootView.getChildAt(0)
         }
 
     class Builder(val target: Any) {

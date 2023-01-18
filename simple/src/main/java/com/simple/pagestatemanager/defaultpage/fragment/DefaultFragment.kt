@@ -2,11 +2,13 @@ package com.simple.pagestatemanager.defaultpage.fragment
 
 import android.os.Bundle
 import android.os.Handler
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.annotation.DrawableRes
+import androidx.annotation.LayoutRes
 import androidx.fragment.app.Fragment
 import com.github.mminng.pagestate.PageStateManager
 import com.simple.pagestatemanager.R
@@ -29,13 +31,18 @@ class DefaultFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        val rootView: ViewGroup = requireView().parent as ViewGroup
+        Log.e("wtf", "count2=${rootView.childCount}")
         pageStateManager = PageStateManager.Builder(this).build()
         pageStateManager.setReloadListener {
             showToast("Reload")
             load((1..3).random())
         }
-
         load()
+        Handler().postDelayed({
+            val root: ViewGroup = requireView().parent as ViewGroup
+            Log.e("wtf", "count1=${root.childCount}")
+        }, 3000)
     }
 
     private fun load(showState: Int = 3) {
