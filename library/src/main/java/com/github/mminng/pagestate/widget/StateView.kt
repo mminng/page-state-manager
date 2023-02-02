@@ -2,7 +2,6 @@ package com.github.mminng.pagestate.widget
 
 import android.content.Context
 import android.util.AttributeSet
-import android.util.Pair
 import android.view.View
 import android.view.ViewStub
 import android.widget.FrameLayout
@@ -33,7 +32,6 @@ internal class StateView @JvmOverloads constructor(
     private val emptyViewStub: ViewStub = ViewStub(context)
     private val errorViewStub: ViewStub = ViewStub(context)
     private val customViewStub: ViewStub = ViewStub(context)
-    private var _contentView: View? = null
     private var _loadingView: View? = null
     private var _emptyView: View? = null
     private var _errorView: View? = null
@@ -53,12 +51,6 @@ internal class StateView @JvmOverloads constructor(
     private var _reloadListener: (() -> Unit)? = null
 
     private var _hasCustom: Boolean = false
-    private var _done: Boolean = false
-    private var isFragmentTarget: Boolean = false
-
-    fun setContentView(contentView: View) {
-        _contentView = contentView
-    }
 
     fun setLoadingView(@LayoutRes layoutId: Int) {
         loadingViewStub.layoutResource = layoutId
@@ -102,45 +94,23 @@ internal class StateView @JvmOverloads constructor(
     }
 
     fun showLoading() {
-        if (_done || contains(_loadingView)) return
-        if (isFragmentTarget) {
-            _contentView?.visibility = INVISIBLE
-        }
-        if (removePage(_emptyView)) {
+        if (isShowing(_loadingView)) return
+        if (hide(_emptyView)) {
             _pageChangeListener?.onPageEmptyChanged(false, _emptyView)
         }
-        if (removePage(_errorView)) {
+        if (hide(_errorView)) {
             _pageChangeListener?.onPageErrorChanged(false, _errorView)
         }
-        if (_hasCustom && removePage(_customView)) {
+        if (_hasCustom && hide(_customView)) {
             _pageChangeListener?.onPageCustomChanged(false, _customView)
         }
         if (!inflatePage(State.LOADING)) {
-            addView(_loadingView)
+            show(_loadingView)
         }
         _pageChangeListener?.onPageLoadingChanged(true, _loadingView)
     }
 
     fun showContent() {
-        if (_done) return
-        if (removePage(_loadingView)) {
-            _pageChangeListener?.onPageLoadingChanged(false, _loadingView)
-        }
-        if (removePage(_emptyView)) {
-            _pageChangeListener?.onPageEmptyChanged(false, _emptyView)
-        }
-        if (removePage(_errorView)) {
-            _pageChangeListener?.onPageErrorChanged(false, _errorView)
-        }
-        if (_hasCustom && removePage(_customView)) {
-            _pageChangeListener?.onPageCustomChanged(false, _customView)
-        }
-        if (isFragmentTarget) {
-            _contentView?.visibility = VISIBLE
-        } else {
-            addView(_contentView)
-        }
-        _done = true
         background = null
         _pageChangeListener = null
         _pageCreateListener = null
@@ -148,63 +118,54 @@ internal class StateView @JvmOverloads constructor(
     }
 
     fun showEmpty(message: String, @DrawableRes iconResId: Int) {
-        if (_done || contains(_emptyView)) return
-        if (isFragmentTarget) {
-            _contentView?.visibility = INVISIBLE
-        }
-        if (removePage(_loadingView)) {
+        if (isShowing(_emptyView)) return
+        if (hide(_loadingView)) {
             _pageChangeListener?.onPageLoadingChanged(false, _loadingView)
         }
-        if (removePage(_errorView)) {
+        if (hide(_errorView)) {
             _pageChangeListener?.onPageErrorChanged(false, _errorView)
         }
-        if (_hasCustom && removePage(_customView)) {
+        if (_hasCustom && hide(_customView)) {
             _pageChangeListener?.onPageCustomChanged(false, _customView)
         }
         if (!inflatePage(State.EMPTY)) {
-            addView(_emptyView)
+            show(_emptyView)
         }
         setPage(State.EMPTY, message, iconResId)
         _pageChangeListener?.onPageEmptyChanged(true, _emptyView)
     }
 
     fun showError(message: String, @DrawableRes iconResId: Int) {
-        if (_done || contains(_errorView)) return
-        if (isFragmentTarget) {
-            _contentView?.visibility = INVISIBLE
-        }
-        if (removePage(_loadingView)) {
+        if (isShowing(_errorView)) return
+        if (hide(_loadingView)) {
             _pageChangeListener?.onPageLoadingChanged(false, _loadingView)
         }
-        if (removePage(_emptyView)) {
+        if (hide(_emptyView)) {
             _pageChangeListener?.onPageEmptyChanged(false, _emptyView)
         }
-        if (_hasCustom && removePage(_customView)) {
+        if (_hasCustom && hide(_customView)) {
             _pageChangeListener?.onPageCustomChanged(false, _customView)
         }
         if (!inflatePage(State.ERROR)) {
-            addView(_errorView)
+            show(_errorView)
         }
         setPage(State.ERROR, message, iconResId)
         _pageChangeListener?.onPageErrorChanged(true, _errorView)
     }
 
     fun showCustom() {
-        if (!_hasCustom || _done || contains(_customView)) return
-        if (isFragmentTarget) {
-            _contentView?.visibility = INVISIBLE
-        }
-        if (removePage(_loadingView)) {
+        if (!_hasCustom || isShowing(_customView)) return
+        if (hide(_loadingView)) {
             _pageChangeListener?.onPageLoadingChanged(false, _loadingView)
         }
-        if (removePage(_emptyView)) {
+        if (hide(_emptyView)) {
             _pageChangeListener?.onPageEmptyChanged(false, _emptyView)
         }
-        if (removePage(_errorView)) {
+        if (hide(_errorView)) {
             _pageChangeListener?.onPageErrorChanged(false, _errorView)
         }
         if (!inflatePage(State.CUSTOM)) {
-            addView(_customView)
+            show(_customView)
         }
         _pageChangeListener?.onPageCustomChanged(true, _customView)
     }
@@ -223,10 +184,6 @@ internal class StateView @JvmOverloads constructor(
 
     fun setReloadListener(listener: () -> Unit) {
         _reloadListener = listener
-    }
-
-    fun isFragmentTarget(isFragmentTarget: Boolean) {
-        this.isFragmentTarget = isFragmentTarget
     }
 
     fun setBackground(@DrawableRes resId: Int) {
@@ -284,16 +241,6 @@ internal class StateView @JvmOverloads constructor(
         }
     }
 
-    private fun removePage(view: View?): Boolean {
-        val pair: Pair<Boolean, Int> = containsAndPosition(view)
-        return if (pair.first) {
-            removeViewAt(pair.second)
-            true
-        } else {
-            false
-        }
-    }
-
     private fun setPage(state: State, message: String, @DrawableRes iconResId: Int) {
         if (state == State.EMPTY) {
             if (_emptyLayoutId == DEFAULT_EMPTY_LAYOUT) {
@@ -340,15 +287,20 @@ internal class StateView @JvmOverloads constructor(
         }
     }
 
-    private fun contains(view: View?): Boolean =
-        if (view == null) false
-        else indexOfChild(view) >= 0
+    private fun show(view: View?) {
+        view?.visibility = VISIBLE
+    }
 
+    private fun hide(view: View?): Boolean =
+        if (isShowing(view)) {
+            view?.visibility = INVISIBLE
+            true
+        } else {
+            false
+        }
 
-    private fun containsAndPosition(view: View?): Pair<Boolean, Int> {
-        if (view == null) return Pair.create(false, -1)
-        val index: Int = indexOfChild(view)
-        return Pair.create(index >= 0, index)
+    private fun isShowing(view: View?): Boolean {
+        return view?.visibility == VISIBLE
     }
 
     override fun onDetachedFromWindow() {

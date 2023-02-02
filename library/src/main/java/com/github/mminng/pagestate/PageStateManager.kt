@@ -19,16 +19,16 @@ import com.github.mminng.pagestate.widget.StateView
 class PageStateManager constructor(builder: Builder) {
 
     private var _stateView: StateView
+    private var _rootView: ViewGroup
+    private var _contentView: View
 
     init {
-        val rootView: ViewGroup = buildRootView(builder.target)
-        val contentView: View = buildContentView(builder.target, rootView)
-        val context: Context = rootView.context
-        val index: Int = rootView.indexOfChild(contentView)
-        rootView.removeView(contentView)
+        _rootView = buildRootView(builder.target)
+        _contentView = buildContentView(builder.target, _rootView)
+        val context: Context = _rootView.context
+        val index: Int = _rootView.indexOfChild(_contentView)
+        _rootView.removeView(_contentView)
         _stateView = StateView(context)
-        _stateView.isFragmentTarget(builder.target is Fragment)
-        _stateView.setContentView(contentView)
         _stateView.setLoadingView(builder.loadingLayout)
         _stateView.setEmptyView(
             builder.emptyLayout,
@@ -45,7 +45,7 @@ class PageStateManager constructor(builder: Builder) {
         _stateView.setCustomLayout(builder.customLayout)
         builder.pageCreateListener?.let { _stateView.setPageCreateListener(it) }
         builder.pageChangeListener?.let { _stateView.setPageChangeListener(it) }
-        rootView.addView(_stateView, index, contentView.layoutParams)
+        _rootView.addView(_stateView, index, _contentView.layoutParams)
     }
 
     fun showLoading() {
@@ -53,7 +53,8 @@ class PageStateManager constructor(builder: Builder) {
     }
 
     fun showContent() {
-        _stateView.showContent()
+        _rootView.addView(_contentView)
+        _rootView.removeView(_stateView)
     }
 
     fun showEmpty(message: String = "", @DrawableRes iconResId: Int = 0) {

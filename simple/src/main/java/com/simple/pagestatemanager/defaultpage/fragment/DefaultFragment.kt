@@ -42,7 +42,7 @@ class DefaultFragment : Fragment() {
         Handler().postDelayed({
             val root: ViewGroup = requireView().parent as ViewGroup
             Log.e("wtf", "count1=${root.childCount}")
-        }, 3000)
+        }, 0)
     }
 
     private fun load(showState: Int = 3) {
