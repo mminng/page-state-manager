@@ -11,7 +11,7 @@ import com.simple.pagestatemanager.R
 
 class DefaultActivity : AppCompatActivity() {
 
-    private lateinit var pageStateManager: PageStateManager
+    private lateinit var pageManager: PageStateManager
     private var _loaded: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -19,30 +19,39 @@ class DefaultActivity : AppCompatActivity() {
         setContentView(R.layout.activity_default)
         val actionBar = supportActionBar
         actionBar?.let {
-            actionBar.title = "Default(On Activity)"
+            actionBar.title = "On Activity"
             actionBar.setDisplayHomeAsUpEnabled(true)
         }
-
-        pageStateManager = PageStateManager.Builder(this).build()
-        pageStateManager.setReloadListener {
-            showToast("Reload")
+        pageManager = PageStateManager.Builder(this)
+            .setLoadingLayout(R.layout.page_state_loading)
+            .setEmptyLayout(
+                layoutId = R.layout.page_state_empty,
+                iconId = R.id.state_empty_icon,
+                textId = R.id.state_empty_text,
+                clickId = R.id.state_empty_btn
+            )
+            .setErrorLayout(
+                layoutId = R.layout.page_state_error,
+                iconId = R.id.state_error_icon,
+                textId = R.id.state_error_text,
+                clickId = R.id.state_error_btn
+            ).build()
+        pageManager.setReloadListener {
             load((1..3).random())
         }
-
         load()
     }
 
     private fun load(showState: Int = 3) {
-        pageStateManager.showLoading()
+        pageManager.showLoading()
         Handler().postDelayed({
             when (showState) {
                 1 -> {
-                    pageStateManager.showContent()
-                    showToast("Show content")
+                    pageManager.showContent()
                     _loaded = true
                 }
-                2 -> pageStateManager.showEmpty()
-                3 -> pageStateManager.showError()
+                2 -> pageManager.showEmpty()
+                3 -> pageManager.showError()
             }
         }, 3000)
     }
@@ -50,29 +59,29 @@ class DefaultActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.loading -> {
-                pageStateManager.showLoading()
-                showToast("Show loading")
+                showToast()
+                pageManager.showLoading()
             }
             R.id.content -> {
-                pageStateManager.showContent()
-                showToast("Show content")
+                showToast()
+                pageManager.showContent()
                 _loaded = true
             }
             R.id.empty -> {
-                pageStateManager.showEmpty()
-                showToast("Show empty")
+                showToast()
+                pageManager.showEmpty()
             }
             R.id.error -> {
-                pageStateManager.showError()
-                showToast("Show error")
+                showToast()
+                pageManager.showError()
             }
             R.id.empty_change -> {
-                pageStateManager.showEmpty("Okay...", R.drawable.ic_empty)
-                showToast("Show empty")
+                showToast()
+                pageManager.showEmpty("Okay...", R.drawable.ic_empty)
             }
             R.id.error_change -> {
-                pageStateManager.showError("Oh no!", R.drawable.ic_error)
-                showToast("Show error")
+                showToast()
+                pageManager.showError("Oh no!", R.drawable.ic_error)
             }
             android.R.id.home -> finish()
             else -> {}
@@ -81,11 +90,13 @@ class DefaultActivity : AppCompatActivity() {
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.menu_default_page_state, menu)
+        menuInflater.inflate(R.menu.menu_page_state, menu)
         return super.onCreateOptionsMenu(menu)
     }
 
-    private fun showToast(message: String) {
-        Toast.makeText(this, if (_loaded) "Content loaded" else message, Toast.LENGTH_SHORT).show()
+    private fun showToast() {
+        if (_loaded) {
+            Toast.makeText(this, "Content loaded", Toast.LENGTH_SHORT).show()
+        }
     }
 }

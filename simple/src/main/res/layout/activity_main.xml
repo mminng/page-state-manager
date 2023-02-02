@@ -7,26 +7,26 @@
     android:orientation="vertical">
 
     <Button
-        android:id="@+id/open_default_activity"
+        android:id="@+id/open_activity"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Default(On Activity)"
+        android:text="On Activity"
         android:textAllCaps="false" />
 
     <Button
-        android:id="@+id/open_default_fragment"
+        android:id="@+id/open_fragment"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
-        android:text="Default(On Fragment)"
+        android:text="On Fragment"
         android:textAllCaps="false" />
 
     <Button
-        android:id="@+id/open_custom"
+        android:id="@+id/open_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
-        android:text="Custom"
+        android:text="On View"
         android:textAllCaps="false"
         app:layout_constraintTop_toTopOf="@+id/guideline2" />
 

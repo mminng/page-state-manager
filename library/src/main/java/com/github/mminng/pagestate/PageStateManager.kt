@@ -21,14 +21,19 @@ class PageStateManager constructor(builder: Builder) {
     private var _stateView: StateView
     private var _rootView: ViewGroup
     private var _contentView: View
+    var index: Int
+    private var _isDone: Boolean = false
 
     init {
-        _rootView = buildRootView(builder.target)
-        _contentView = buildContentView(builder.target, _rootView)
+        _rootView = requireRootView(builder.target)
+        _contentView = requireContentView(builder.target, _rootView)
         val context: Context = _rootView.context
-        val index: Int = _rootView.indexOfChild(_contentView)
+        index = _rootView.indexOfChild(_contentView)
+//        _contentView.visibility = View.INVISIBLE
         _rootView.removeView(_contentView)
         _stateView = StateView(context)
+        _rootView.addView(_stateView, index, _contentView.layoutParams)
+        _stateView.background = _contentView.background
         _stateView.setLoadingView(builder.loadingLayout)
         _stateView.setEmptyView(
             builder.emptyLayout,
@@ -45,27 +50,32 @@ class PageStateManager constructor(builder: Builder) {
         _stateView.setCustomLayout(builder.customLayout)
         builder.pageCreateListener?.let { _stateView.setPageCreateListener(it) }
         builder.pageChangeListener?.let { _stateView.setPageChangeListener(it) }
-        _rootView.addView(_stateView, index, _contentView.layoutParams)
     }
 
     fun showLoading() {
+        if (_isDone) return
         _stateView.showLoading()
     }
 
     fun showContent() {
-        _rootView.addView(_contentView)
+//        _contentView.visibility = View.VISIBLE
+        _rootView.addView(_contentView, index)
         _rootView.removeView(_stateView)
+        _isDone = true
     }
 
     fun showEmpty(message: String = "", @DrawableRes iconResId: Int = 0) {
+        if (_isDone) return
         _stateView.showEmpty(message, iconResId)
     }
 
     fun showError(message: String = "", @DrawableRes iconResId: Int = 0) {
+        if (_isDone) return
         _stateView.showError(message, iconResId)
     }
 
     fun showCustom() {
+        if (_isDone) return
         _stateView.showCustom()
     }
 
@@ -73,11 +83,7 @@ class PageStateManager constructor(builder: Builder) {
         _stateView.setReloadListener(listener)
     }
 
-    fun setBackground(@DrawableRes resId: Int) {
-        _stateView.setBackground(resId)
-    }
-
-    private fun buildRootView(target: Any): ViewGroup =
+    private fun requireRootView(target: Any): ViewGroup =
         when (target) {
             is Activity -> {
                 target.findViewById(Window.ID_ANDROID_CONTENT)
@@ -95,7 +101,7 @@ class PageStateManager constructor(builder: Builder) {
             else -> throw IllegalArgumentException("The target type must be Fragment or Activity or View.")
         }
 
-    private fun buildContentView(target: Any, rootView: ViewGroup): View =
+    private fun requireContentView(target: Any, rootView: ViewGroup): View =
         if (target is View) {
             target
         } else {
@@ -104,11 +110,11 @@ class PageStateManager constructor(builder: Builder) {
 
     class Builder(val target: Any) {
 
-        var loadingLayout: Int = StateView.DEFAULT_LOADING_LAYOUT
+        var loadingLayout: Int = 0
             private set
-        var emptyLayout: Int = StateView.DEFAULT_EMPTY_LAYOUT
+        var emptyLayout: Int = 0
             private set
-        var errorLayout: Int = StateView.DEFAULT_ERROR_LAYOUT
+        var errorLayout: Int = 0
             private set
         var customLayout: Int = 0
             private set
@@ -135,8 +141,8 @@ class PageStateManager constructor(builder: Builder) {
 
         fun setEmptyLayout(
             @LayoutRes layoutId: Int,
-            @IdRes iconId: Int = 0,
-            @IdRes textId: Int = 0,
+            @IdRes iconId: Int = 0,/*support ImageView only*/
+            @IdRes textId: Int = 0,/*support TextView only*/
             @IdRes clickId: Int = 0
         ) = apply {
             emptyLayout = layoutId
@@ -147,8 +153,8 @@ class PageStateManager constructor(builder: Builder) {
 
         fun setErrorLayout(
             @LayoutRes layoutId: Int,
-            @IdRes iconId: Int = 0,
-            @IdRes textId: Int = 0,
+            @IdRes iconId: Int = 0,/*support ImageView only*/
+            @IdRes textId: Int = 0,/*support TextView only*/
             @IdRes clickId: Int = 0
         ) = apply {
             errorLayout = layoutId

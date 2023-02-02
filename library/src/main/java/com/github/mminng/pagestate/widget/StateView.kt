@@ -22,12 +22,6 @@ internal class StateView @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null
 ) : FrameLayout(context, attrs) {
 
-    companion object {
-        val DEFAULT_LOADING_LAYOUT: Int = R.layout.default_page_state_loading
-        val DEFAULT_EMPTY_LAYOUT: Int = R.layout.default_page_state_empty
-        val DEFAULT_ERROR_LAYOUT: Int = R.layout.default_page_state_error
-    }
-
     private val loadingViewStub: ViewStub = ViewStub(context)
     private val emptyViewStub: ViewStub = ViewStub(context)
     private val errorViewStub: ViewStub = ViewStub(context)
@@ -37,11 +31,9 @@ internal class StateView @JvmOverloads constructor(
     private var _errorView: View? = null
     private var _customView: View? = null
 
-    private var _emptyLayoutId: Int = 0
     private var _emptyIconId: Int = 0
     private var _emptyTextId: Int = 0
     private var _emptyClickId: Int = 0
-    private var _errorLayoutId: Int = 0
     private var _errorIconId: Int = 0
     private var _errorTextId: Int = 0
     private var _errorClickId: Int = 0
@@ -59,12 +51,11 @@ internal class StateView @JvmOverloads constructor(
 
     fun setEmptyView(
         @LayoutRes layoutId: Int,
-        @IdRes iconId: Int = 0,
-        @IdRes textId: Int = 0,
+        @IdRes iconId: Int = 0,/*support ImageView only*/
+        @IdRes textId: Int = 0,/*support TextView only*/
         @IdRes clickId: Int = 0
     ) {
         emptyViewStub.layoutResource = layoutId
-        _emptyLayoutId = layoutId
         _emptyIconId = iconId
         _emptyTextId = textId
         _emptyClickId = clickId
@@ -73,12 +64,11 @@ internal class StateView @JvmOverloads constructor(
 
     fun setErrorView(
         @LayoutRes layoutId: Int,
-        @IdRes iconId: Int = 0,
-        @IdRes textId: Int = 0,
+        @IdRes iconId: Int = 0,/*support ImageView only*/
+        @IdRes textId: Int = 0,/*support TextView only*/
         @IdRes clickId: Int = 0
     ) {
         errorViewStub.layoutResource = layoutId
-        _errorLayoutId = layoutId
         _errorIconId = iconId
         _errorTextId = textId
         _errorClickId = clickId
@@ -108,13 +98,6 @@ internal class StateView @JvmOverloads constructor(
             show(_loadingView)
         }
         _pageChangeListener?.onPageLoadingChanged(true, _loadingView)
-    }
-
-    fun showContent() {
-        background = null
-        _pageChangeListener = null
-        _pageCreateListener = null
-        _reloadListener = null
     }
 
     fun showEmpty(message: String, @DrawableRes iconResId: Int) {
@@ -186,45 +169,45 @@ internal class StateView @JvmOverloads constructor(
         _reloadListener = listener
     }
 
-    fun setBackground(@DrawableRes resId: Int) {
-        setBackgroundResource(resId)
-    }
-
     private fun inflatePage(state: State): Boolean {
         when (state) {
             State.LOADING -> {
                 return if (loadingViewStub.parent != null) {
-                    _loadingView = loadingViewStub.inflate()
-                    _pageCreateListener?.onPageLoadingCreated(_loadingView)
-                    true
+                    if (loadingViewStub.layoutResource != 0) {
+                        _loadingView = loadingViewStub.inflate()
+                        _pageCreateListener?.onPageLoadingCreated(_loadingView)
+                        true
+                    } else {
+                        throw IllegalArgumentException("Loading layout not set.")
+                    }
                 } else {
                     false
                 }
             }
             State.EMPTY -> {
                 return if (emptyViewStub.parent != null) {
-                    _emptyView = emptyViewStub.inflate()
-                    if (_emptyLayoutId == DEFAULT_EMPTY_LAYOUT) {
-                        invokeReload(_emptyView, R.id.state_empty_btn)
-                    } else {
+                    if (emptyViewStub.layoutResource != 0) {
+                        _emptyView = emptyViewStub.inflate()
                         invokeReload(_emptyView, _emptyClickId)
+                        _pageCreateListener?.onPageEmptyCreated(_emptyView)
+                        true
+                    } else {
+                        throw IllegalArgumentException("Empty layout not set.")
                     }
-                    _pageCreateListener?.onPageEmptyCreated(_emptyView)
-                    true
                 } else {
                     false
                 }
             }
             State.ERROR -> {
                 return if (errorViewStub.parent != null) {
-                    _errorView = errorViewStub.inflate()
-                    if (_errorLayoutId == DEFAULT_ERROR_LAYOUT) {
-                        invokeReload(_errorView, R.id.state_error_btn)
-                    } else {
+                    if (errorViewStub.layoutResource != 0) {
+                        _errorView = errorViewStub.inflate()
                         invokeReload(_errorView, _errorClickId)
+                        _pageCreateListener?.onPageErrorCreated(_errorView)
+                        true
+                    } else {
+                        throw IllegalArgumentException("Error layout not set.")
                     }
-                    _pageCreateListener?.onPageErrorCreated(_errorView)
-                    true
                 } else {
                     false
                 }
@@ -243,21 +226,11 @@ internal class StateView @JvmOverloads constructor(
 
     private fun setPage(state: State, message: String, @DrawableRes iconResId: Int) {
         if (state == State.EMPTY) {
-            if (_emptyLayoutId == DEFAULT_EMPTY_LAYOUT) {
-                setPageIcon(_emptyView, R.id.state_empty_icon, iconResId)
-                setPageMessage(_emptyView, R.id.state_empty_text, message)
-            } else {
-                setPageIcon(_emptyView, _emptyIconId, iconResId)
-                setPageMessage(_emptyView, _emptyTextId, message)
-            }
+            setPageIcon(_emptyView, _emptyIconId, iconResId)
+            setPageMessage(_emptyView, _emptyTextId, message)
         } else if (state == State.ERROR) {
-            if (_errorLayoutId == DEFAULT_ERROR_LAYOUT) {
-                setPageIcon(_errorView, R.id.state_error_icon, iconResId)
-                setPageMessage(_errorView, R.id.state_error_text, message)
-            } else {
-                setPageIcon(_errorView, _errorIconId, iconResId)
-                setPageMessage(_errorView, _errorTextId, message)
-            }
+            setPageIcon(_errorView, _errorIconId, iconResId)
+            setPageMessage(_errorView, _errorTextId, message)
         }
     }
 

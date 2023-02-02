@@ -16,7 +16,7 @@ class DefaultFragmentActivity : AppCompatActivity() {
         setContentView(R.layout.activity_fragment_default)
         val actionBar = supportActionBar
         actionBar?.let {
-            actionBar.title = "Default(On Fragment)"
+            actionBar.title = "On Fragment"
             actionBar.setDisplayHomeAsUpEnabled(true)
         }
         if (supportFragmentManager.findFragmentById(R.id.fragment_content) == null) {
@@ -56,7 +56,7 @@ class DefaultFragmentActivity : AppCompatActivity() {
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.menu_default_page_state, menu)
+        menuInflater.inflate(R.menu.menu_page_state, menu)
         return super.onCreateOptionsMenu(menu)
     }
 }
