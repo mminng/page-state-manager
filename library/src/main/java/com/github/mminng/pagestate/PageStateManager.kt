@@ -30,10 +30,11 @@ class PageStateManager constructor(builder: Builder) {
         val context: Context = _rootView.context
         index = _rootView.indexOfChild(_contentView)
 //        _contentView.visibility = View.INVISIBLE
-        _rootView.removeView(_contentView)
         _stateView = StateView(context)
-        _rootView.addView(_stateView, index, _contentView.layoutParams)
+        _rootView.removeView(_contentView)
         _stateView.background = _contentView.background
+        _rootView.addView(_stateView, index, _contentView.layoutParams)
+//        _stateView.setContentView(_contentView)
         _stateView.setLoadingView(builder.loadingLayout)
         _stateView.setEmptyView(
             builder.emptyLayout,
@@ -47,7 +48,10 @@ class PageStateManager constructor(builder: Builder) {
             builder.errorTextId,
             builder.errorClickId
         )
-        _stateView.setCustomLayout(builder.customLayout)
+        _stateView.setCustomLayout(
+            builder.customLayout,
+            builder.customClickId
+        )
         builder.pageCreateListener?.let { _stateView.setPageCreateListener(it) }
         builder.pageChangeListener?.let { _stateView.setPageChangeListener(it) }
     }
@@ -61,6 +65,7 @@ class PageStateManager constructor(builder: Builder) {
 //        _contentView.visibility = View.VISIBLE
         _rootView.addView(_contentView, index)
         _rootView.removeView(_stateView)
+//        _stateView.showContent()
         _isDone = true
     }
 
@@ -130,6 +135,8 @@ class PageStateManager constructor(builder: Builder) {
             private set
         var errorClickId: Int = 0
             private set
+        var customClickId: Int = 0
+            private set
         var pageCreateListener: (PageCreateListener.() -> Unit)? = null
             private set
         var pageChangeListener: (PageChangeListener.() -> Unit)? = null
@@ -163,8 +170,12 @@ class PageStateManager constructor(builder: Builder) {
             errorClickId = clickId
         }
 
-        fun setCustomLayout(@LayoutRes layoutId: Int) = apply {
+        fun setCustomLayout(
+            @LayoutRes layoutId: Int,
+            @IdRes clickId: Int = 0
+        ) = apply {
             customLayout = layoutId
+            customClickId = clickId
         }
 
         fun setPageCreateListener(listener: PageCreateListener.() -> Unit) = apply {
