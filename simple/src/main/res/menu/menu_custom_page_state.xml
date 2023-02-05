@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/loading"
+        android:title="Loading" />
+    <item
+        android:id="@+id/content"
+        android:title="Content" />
+    <item
+        android:id="@+id/empty"
+        android:title="Empty" />
+    <item
+        android:id="@+id/error"
+        android:title="Error" />
+    <item
+        android:id="@+id/custom"
+        android:title="Custom" />
+    <item
+        android:id="@+id/empty_change"
+        android:title="Empty(Change icon and text)" />
+    <item
+        android:id="@+id/error_change"
+        android:title="Error(Change icon and text)" />
+</menu>

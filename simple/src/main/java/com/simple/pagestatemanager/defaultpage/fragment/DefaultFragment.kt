@@ -2,6 +2,7 @@ package com.simple.pagestatemanager.defaultpage.fragment
 
 import android.os.Bundle
 import android.os.Handler
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,6 +16,10 @@ import com.simple.pagestatemanager.R
  * Created by zh on 2023/1/15.
  */
 class DefaultFragment : Fragment() {
+
+    companion object {
+        const val TAG: String = "PageManager"
+    }
 
     private lateinit var pageManager: PageStateManager
     private var _loaded: Boolean = false
@@ -42,9 +47,39 @@ class DefaultFragment : Fragment() {
                 iconId = R.id.state_error_icon,
                 textId = R.id.state_error_text,
                 clickId = R.id.state_error_btn
-            ).build()
+            )
+            .setCustomLayout(
+                layoutId = R.layout.page_state_custom,
+                clickId = R.id.state_custom_btn
+            ).setPageCreateListener {
+                pageLoadingCreated {
+                    Log.e(TAG, "Loading created")
+                }
+                pageEmptyCreated {
+                    Log.e(TAG, "Empty created")
+                }
+                pageErrorCreated {
+                    Log.e(TAG, "Error created")
+                }
+                pageCustomCreated {
+                    Log.e(TAG, "Custom created")
+                }
+            }.setPageChangeListener {
+                pageLoadingChanged { visible, view ->
+                    Log.e(TAG, "Loading=$visible")
+                }
+                pageEmptyChanged { visible, view ->
+                    Log.e(TAG, "Empty=$visible")
+                }
+                pageErrorChanged { visible, view ->
+                    Log.e(TAG, "Error=$visible")
+                }
+                pageCustomChanged { visible, view ->
+                    Log.e(TAG, "Custom=$visible")
+                }
+            }.build()
         pageManager.setReloadListener {
-            load((1..3).random())
+            load((1..4).random())
         }
         load()
     }
@@ -59,6 +94,7 @@ class DefaultFragment : Fragment() {
                 }
                 2 -> pageManager.showEmpty()
                 3 -> pageManager.showError()
+                4 -> pageManager.showCustom()
             }
         }, 3000)
     }
@@ -82,6 +118,11 @@ class DefaultFragment : Fragment() {
     fun showError(message: String = "", @DrawableRes iconResId: Int = 0) {
         showToast()
         pageManager.showError(message, iconResId)
+    }
+
+    fun showCustom() {
+        showToast()
+        pageManager.showCustom()
     }
 
     private fun showToast() {

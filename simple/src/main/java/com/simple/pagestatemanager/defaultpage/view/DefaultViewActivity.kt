@@ -26,56 +26,40 @@ class DefaultViewActivity : AppCompatActivity() {
             .setLoadingLayout(R.layout.page_state_loading)
             .setEmptyLayout(
                 layoutId = R.layout.page_state_empty,
-                iconId = R.id.state_empty_icon,
-                textId = R.id.state_empty_text,
                 clickId = R.id.state_empty_btn
             )
             .setErrorLayout(
                 layoutId = R.layout.page_state_error,
-                iconId = R.id.state_error_icon,
-                textId = R.id.state_error_text,
                 clickId = R.id.state_error_btn
             ).build()
         pageManager2 = PageStateManager.Builder(findViewById(R.id.view_two))
             .setLoadingLayout(R.layout.page_state_loading)
             .setEmptyLayout(
                 layoutId = R.layout.page_state_empty,
-                iconId = R.id.state_empty_icon,
-                textId = R.id.state_empty_text,
                 clickId = R.id.state_empty_btn
             )
             .setErrorLayout(
                 layoutId = R.layout.page_state_error,
-                iconId = R.id.state_error_icon,
-                textId = R.id.state_error_text,
                 clickId = R.id.state_error_btn
             ).build()
         pageManager3 = PageStateManager.Builder(findViewById(R.id.view_three))
             .setLoadingLayout(R.layout.page_state_loading)
             .setEmptyLayout(
                 layoutId = R.layout.page_state_empty,
-                iconId = R.id.state_empty_icon,
-                textId = R.id.state_empty_text,
                 clickId = R.id.state_empty_btn
             )
             .setErrorLayout(
                 layoutId = R.layout.page_state_error,
-                iconId = R.id.state_error_icon,
-                textId = R.id.state_error_text,
                 clickId = R.id.state_error_btn
             ).build()
         pageManager4 = PageStateManager.Builder(findViewById(R.id.view_four))
             .setLoadingLayout(R.layout.page_state_loading)
             .setEmptyLayout(
                 layoutId = R.layout.page_state_empty,
-                iconId = R.id.state_empty_icon,
-                textId = R.id.state_empty_text,
                 clickId = R.id.state_empty_btn
             )
             .setErrorLayout(
                 layoutId = R.layout.page_state_error,
-                iconId = R.id.state_error_icon,
-                textId = R.id.state_error_text,
                 clickId = R.id.state_error_btn
             ).build()
         pageManager1.setReloadListener {

@@ -39,6 +39,7 @@ internal class StateView @JvmOverloads constructor(
     private var _errorTextId: Int = 0
     private var _errorClickId: Int = 0
     private var _customClickId: Int = 0
+    private val views: SparseArray<View> = SparseArray()
 
     private var _pageCreateListener: PageCreateListener? = null
     private var _pageChangeListener: PageChangeListener? = null
@@ -245,20 +246,9 @@ internal class StateView @JvmOverloads constructor(
         }
     }
 
-    private val views: SparseArray<View> = SparseArray()
-    private fun getView(targetView: View?, @IdRes viewId: Int): View? {
-        val view = views.get(viewId)
-        if (view == null) {
-            val new = targetView?.findViewById<View>(viewId)
-            views.put(viewId, new)
-            return new
-        }
-        return view
-    }
-
     private fun setPageIcon(view: View?, @IdRes viewId: Int, @DrawableRes iconId: Int) {
         if (view != null && viewId != 0 && iconId != 0) {
-            val imageView: View = view.findViewById(viewId)
+            val imageView: View = getView(view, viewId)
             if (imageView is ImageView) {
                 imageView.setImageResource(iconId)
             }
@@ -267,7 +257,7 @@ internal class StateView @JvmOverloads constructor(
 
     private fun setPageMessage(view: View?, @IdRes viewId: Int, message: String) {
         if (view != null && viewId != 0 && message.isNotBlank()) {
-            val textView: View = view.findViewById(viewId)
+            val textView: View = getView(view, viewId)
             if (textView is TextView) {
                 textView.text = message
             }
@@ -294,6 +284,16 @@ internal class StateView @JvmOverloads constructor(
 
     private fun isShowing(view: View?): Boolean {
         return view?.visibility == VISIBLE
+    }
+
+    private fun getView(targetView: View, @IdRes viewId: Int): View {
+        val view = views.get(viewId)
+        if (view == null) {
+            val new = targetView.findViewById<View>(viewId)
+            views.put(viewId, new)
+            return new
+        }
+        return view
     }
 
     override fun onDetachedFromWindow() {

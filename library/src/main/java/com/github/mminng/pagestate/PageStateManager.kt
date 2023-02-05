@@ -1,7 +1,6 @@
 package com.github.mminng.pagestate
 
 import android.app.Activity
-import android.content.Context
 import android.view.View
 import android.view.ViewGroup
 import android.view.Window
@@ -21,20 +20,23 @@ class PageStateManager constructor(builder: Builder) {
     private var _stateView: StateView
     private var _rootView: ViewGroup
     private var _contentView: View
-    var index: Int
+    private var _index: Int
+    private var _isFragment: Boolean
     private var _isDone: Boolean = false
 
     init {
         _rootView = requireRootView(builder.target)
         _contentView = requireContentView(builder.target, _rootView)
-        val context: Context = _rootView.context
-        index = _rootView.indexOfChild(_contentView)
-//        _contentView.visibility = View.INVISIBLE
-        _stateView = StateView(context)
-        _rootView.removeView(_contentView)
+        _index = _rootView.indexOfChild(_contentView)
+        _isFragment = builder.target is Fragment
+        _stateView = StateView(_rootView.context)
         _stateView.background = _contentView.background
-        _rootView.addView(_stateView, index, _contentView.layoutParams)
-//        _stateView.setContentView(_contentView)
+        _rootView.addView(_stateView, _index, _contentView.layoutParams)
+        if (_isFragment) {
+            _contentView.visibility = View.INVISIBLE
+        } else {
+            _rootView.removeView(_contentView)
+        }
         _stateView.setLoadingView(builder.loadingLayout)
         _stateView.setEmptyView(
             builder.emptyLayout,
@@ -62,10 +64,13 @@ class PageStateManager constructor(builder: Builder) {
     }
 
     fun showContent() {
-//        _contentView.visibility = View.VISIBLE
-        _rootView.addView(_contentView, index)
+        if (_isDone) return
+        if (_isFragment) {
+            _contentView.visibility = View.VISIBLE
+        } else {
+            _rootView.addView(_contentView, _index)
+        }
         _rootView.removeView(_stateView)
-//        _stateView.showContent()
         _isDone = true
     }
 

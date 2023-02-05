@@ -7,10 +7,9 @@
     android:orientation="vertical">
 
     <ImageView
-        android:id="@+id/state_empty_icon"
         android:layout_width="78dp"
         android:layout_height="78dp"
-        android:src="@drawable/ic_state_empty"
+        android:src="@drawable/ic_internet"
         tools:ignore="ContentDescription" />
 
     <TextView
@@ -18,12 +17,12 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:text="@string/default_page_state_empty"
-        android:textColor="#999999"
-        android:textSize="14sp" />
+        android:text="No Internet!"
+        android:textSize="18sp"
+        android:textStyle="bold" />
 
     <TextView
-        android:id="@+id/state_empty_btn"
+        android:id="@+id/state_custom_btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="15dp"

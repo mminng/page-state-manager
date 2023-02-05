@@ -30,4 +30,12 @@
         android:textAllCaps="false"
         app:layout_constraintTop_toTopOf="@+id/guideline2" />
 
+    <Button
+        android:id="@+id/open_lottie"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:text="Lottie"
+        android:textAllCaps="false"
+        app:layout_constraintTop_toTopOf="@+id/guideline2" />
 </LinearLayout>

@@ -25,7 +25,8 @@ class DefaultFragmentActivity : AppCompatActivity() {
             ft.add(R.id.fragment_content, fragment)
             ft.commit()
         } else {
-            fragment = supportFragmentManager.findFragmentById(R.id.fragment_content) as DefaultFragment
+            fragment =
+                supportFragmentManager.findFragmentById(R.id.fragment_content) as DefaultFragment
         }
     }
 
@@ -43,6 +44,9 @@ class DefaultFragmentActivity : AppCompatActivity() {
             R.id.error -> {
                 fragment.showError()
             }
+            R.id.custom -> {
+                fragment.showCustom()
+            }
             R.id.empty_change -> {
                 fragment.showEmpty("Okay...", R.drawable.ic_empty)
             }
@@ -56,7 +60,7 @@ class DefaultFragmentActivity : AppCompatActivity() {
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.menu_page_state, menu)
+        menuInflater.inflate(R.menu.menu_custom_page_state, menu)
         return super.onCreateOptionsMenu(menu)
     }
 }

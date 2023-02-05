@@ -6,6 +6,7 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import com.simple.pagestatemanager.defaultpage.activity.DefaultActivity
 import com.simple.pagestatemanager.defaultpage.fragment.DefaultFragmentActivity
+import com.simple.pagestatemanager.defaultpage.lottie.LottieActivity
 import com.simple.pagestatemanager.defaultpage.view.DefaultViewActivity
 
 /**
@@ -23,6 +24,9 @@ class MainActivity : AppCompatActivity() {
         }
         findViewById<View>(R.id.open_view).setOnClickListener {
             startActivity(Intent(this@MainActivity, DefaultViewActivity::class.java))
+        }
+        findViewById<View>(R.id.open_lottie).setOnClickListener {
+            startActivity(Intent(this@MainActivity, LottieActivity::class.java))
         }
     }
 }
