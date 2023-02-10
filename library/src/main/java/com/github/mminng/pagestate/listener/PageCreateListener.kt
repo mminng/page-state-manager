@@ -2,9 +2,6 @@ package com.github.mminng.pagestate.listener
 
 import android.view.View
 
-/**
- * Created by zh on 2023/1/10.
- */
 class PageCreateListener : OnPageCreateListener {
 
     private var _pageLoadingCreated: ((view: View) -> Unit)? = null
@@ -45,7 +42,7 @@ class PageCreateListener : OnPageCreateListener {
     }
 }
 
-interface OnPageCreateListener {
+internal interface OnPageCreateListener {
 
     fun onPageLoadingCreated(view: View?)
 

@@ -18,8 +18,8 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:text="No Internet!"
-        android:textSize="18sp"
-        android:textStyle="bold" />
+        android:textColor="#999999"
+        android:textSize="14sp" />
 
     <TextView
         android:id="@+id/state_custom_btn"

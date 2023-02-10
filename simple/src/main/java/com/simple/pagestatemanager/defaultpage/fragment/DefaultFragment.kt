@@ -96,7 +96,7 @@ class DefaultFragment : Fragment() {
                 3 -> pageManager.showError()
                 4 -> pageManager.showCustom()
             }
-        }, 3000)
+        }, 550)
     }
 
     fun showLoading() {

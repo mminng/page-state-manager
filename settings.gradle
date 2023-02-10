@@ -15,4 +15,3 @@ dependencyResolutionManagement {
 rootProject.name = "PageStateManager"
 include ':simple'
 include ':library'
-include ':loadingandretrymanager'

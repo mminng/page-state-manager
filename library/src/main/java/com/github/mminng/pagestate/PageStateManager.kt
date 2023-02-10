@@ -12,31 +12,19 @@ import com.github.mminng.pagestate.listener.PageChangeListener
 import com.github.mminng.pagestate.listener.PageCreateListener
 import com.github.mminng.pagestate.widget.StateView
 
-/**
- * Created by zh on 2023/1/6.
- */
 class PageStateManager constructor(builder: Builder) {
 
     private var _stateView: StateView
-    private var _rootView: ViewGroup
-    private var _contentView: View
-    private var _index: Int
-    private var _isFragment: Boolean
     private var _isDone: Boolean = false
 
     init {
-        _rootView = requireRootView(builder.target)
-        _contentView = requireContentView(builder.target, _rootView)
-        _index = _rootView.indexOfChild(_contentView)
-        _isFragment = builder.target is Fragment
-        _stateView = StateView(_rootView.context)
-        _stateView.background = _contentView.background
-        _rootView.addView(_stateView, _index, _contentView.layoutParams)
-        if (_isFragment) {
-            _contentView.visibility = View.INVISIBLE
-        } else {
-            _rootView.removeView(_contentView)
-        }
+        val rootView: ViewGroup = requireRootView(builder.target)
+        val contentView: View = requireContentView(builder.target, rootView)
+        val index: Int = rootView.indexOfChild(contentView)
+        val isFragment: Boolean = builder.target is Fragment
+        _stateView = StateView(rootView.context)
+        _stateView.background = contentView.background
+        _stateView.setContentView(contentView, rootView, index, isFragment)
         _stateView.setLoadingView(builder.loadingLayout)
         _stateView.setEmptyView(
             builder.emptyLayout,
@@ -54,6 +42,7 @@ class PageStateManager constructor(builder: Builder) {
             builder.customLayout,
             builder.customClickId
         )
+        rootView.addView(_stateView, index, contentView.layoutParams)
         builder.pageCreateListener?.let { _stateView.setPageCreateListener(it) }
         builder.pageChangeListener?.let { _stateView.setPageChangeListener(it) }
     }
@@ -65,12 +54,7 @@ class PageStateManager constructor(builder: Builder) {
 
     fun showContent() {
         if (_isDone) return
-        if (_isFragment) {
-            _contentView.visibility = View.VISIBLE
-        } else {
-            _rootView.addView(_contentView, _index)
-        }
-        _rootView.removeView(_stateView)
+        _stateView.showContent()
         _isDone = true
     }
 

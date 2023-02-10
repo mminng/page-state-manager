@@ -53,7 +53,7 @@ class DefaultActivity : AppCompatActivity() {
                 2 -> pageManager.showEmpty()
                 3 -> pageManager.showError()
             }
-        }, 3000)
+        }, 450)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

@@ -2,9 +2,11 @@ package com.github.mminng.pagestate.widget
 
 import android.content.Context
 import android.util.AttributeSet
+import android.util.Log
 import android.util.SparseArray
 import android.view.View
 import android.view.View.OnClickListener
+import android.view.ViewGroup
 import android.view.ViewStub
 import android.widget.FrameLayout
 import android.widget.ImageView
@@ -16,9 +18,9 @@ import com.github.mminng.pagestate.listener.PageChangeListener
 import com.github.mminng.pagestate.listener.PageCreateListener
 import com.github.mminng.pagestate.state.State
 
-/**
- * Created by zh on 2022/12/20.
- */
+private const val MIN_SHOW_MS: Long = 500
+private const val MIN_DELAY_MS: Long = 500
+
 internal class StateView @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null
 ) : FrameLayout(context, attrs), OnClickListener {
@@ -31,6 +33,10 @@ internal class StateView @JvmOverloads constructor(
     private var _emptyView: View? = null
     private var _errorView: View? = null
     private var _customView: View? = null
+    private var _contentView: View? = null
+    private var _rootView: ViewGroup? = null
+    private var _contentIndex: Int = 0
+    private var _isFragment: Boolean = false
 
     private var _emptyIconId: Int = 0
     private var _emptyTextId: Int = 0
@@ -46,6 +52,34 @@ internal class StateView @JvmOverloads constructor(
     private var _reloadListener: (() -> Unit)? = null
 
     private var _hasCustom: Boolean = false
+    private var _startTime: Long = -1
+    private var _currentState: State = State.LOADING
+    private var _currentMessage: String = ""
+    private var _currentIconResId: Int = 0
+
+    private val delayedShowLoading: Runnable = Runnable {
+        showLoadingPage()
+    }
+    private val delayedShowOther: Runnable = Runnable {
+        showOtherPage()
+    }
+
+    fun setContentView(
+        contentView: View,
+        rootView: ViewGroup,
+        index: Int,
+        isFragment: Boolean
+    ) {
+        if (isFragment) {
+            contentView.visibility = View.INVISIBLE
+        } else {
+            rootView.removeView(contentView)
+        }
+        _contentView = contentView
+        _rootView = rootView
+        _contentIndex = index
+        _isFragment = isFragment
+    }
 
     fun setLoadingView(@LayoutRes layoutId: Int) {
         loadingViewStub.layoutResource = layoutId
@@ -101,13 +135,110 @@ internal class StateView @JvmOverloads constructor(
         if (_hasCustom && hide(_customView)) {
             _pageChangeListener?.onPageCustomChanged(false, _customView)
         }
-        if (!inflatePage(State.LOADING)) {
-            show(_loadingView)
-        }
-        _pageChangeListener?.onPageLoadingChanged(true, _loadingView)
+        removeCallbacks()
+        postDelayed(delayedShowLoading, MIN_DELAY_MS)
+    }
+
+    fun showContent() {
+        showOther(State.CONTENT)
     }
 
     fun showEmpty(message: String, @DrawableRes iconResId: Int) {
+        showOther(State.EMPTY, message, iconResId)
+    }
+
+    fun showError(message: String, @DrawableRes iconResId: Int) {
+        showOther(State.ERROR, message, iconResId)
+    }
+
+    fun showCustom() {
+        showOther(State.CUSTOM)
+    }
+
+    fun setPageCreateListener(listener: PageCreateListener.() -> Unit) {
+        val pageCreatedListener = PageCreateListener()
+        pageCreatedListener.listener()
+        _pageCreateListener = pageCreatedListener
+    }
+
+    fun setPageChangeListener(listener: PageChangeListener.() -> Unit) {
+        val pageChangeListener = PageChangeListener()
+        pageChangeListener.listener()
+        _pageChangeListener = pageChangeListener
+    }
+
+    fun setReloadListener(listener: () -> Unit) {
+        _reloadListener = listener
+    }
+
+    private fun showOther(
+        state: State,
+        message: String = "",
+        @DrawableRes iconResId: Int = 0
+    ) {
+        removeCallbacks()
+        _currentState = state
+        _currentMessage = message
+        _currentIconResId = iconResId
+        val diff: Long = System.currentTimeMillis() - _startTime
+        if (diff >= MIN_SHOW_MS || _startTime == -1L) {
+            showOtherPage()
+        } else {
+            postDelayed(delayedShowOther, MIN_SHOW_MS - diff)
+        }
+    }
+
+    private fun showOtherPage() {
+        _startTime = -1
+        when (_currentState) {
+            State.CONTENT -> {
+                showContentPage()
+            }
+            State.EMPTY -> {
+                showEmptyPage(_currentMessage, _currentIconResId)
+            }
+            State.ERROR -> {
+                showErrorPage(_currentMessage, _currentIconResId)
+            }
+            State.CUSTOM -> {
+                showCustomPage()
+            }
+            else -> {
+                //NO OP
+            }
+        }
+    }
+
+    private fun showLoadingPage() {
+        if (!inflatePage(State.LOADING)) {
+            show(_loadingView)
+        }
+        _startTime = System.currentTimeMillis()
+        _pageChangeListener?.onPageLoadingChanged(true, _loadingView)
+    }
+
+    private fun showContentPage() {
+        if (hide(_loadingView)) {
+            _pageChangeListener?.onPageLoadingChanged(false, _loadingView)
+        }
+        if (hide(_emptyView)) {
+            _pageChangeListener?.onPageEmptyChanged(false, _emptyView)
+        }
+        if (hide(_errorView)) {
+            _pageChangeListener?.onPageErrorChanged(false, _errorView)
+        }
+        if (_hasCustom && hide(_customView)) {
+            _pageChangeListener?.onPageCustomChanged(false, _customView)
+        }
+        if (_isFragment) {
+            _contentView?.visibility = View.VISIBLE
+        } else {
+            _rootView?.addView(_contentView, _contentIndex)
+        }
+        _rootView?.removeView(this)
+    }
+
+    private fun showEmptyPage(message: String, @DrawableRes iconResId: Int) {
         if (isShowing(_emptyView)) return
         if (hide(_loadingView)) {
             _pageChangeListener?.onPageLoadingChanged(false, _loadingView)
@@ -125,7 +256,7 @@ internal class StateView @JvmOverloads constructor(
         _pageChangeListener?.onPageEmptyChanged(true, _emptyView)
     }
 
-    fun showError(message: String, @DrawableRes iconResId: Int) {
+    private fun showErrorPage(message: String, @DrawableRes iconResId: Int) {
         if (isShowing(_errorView)) return
         if (hide(_loadingView)) {
             _pageChangeListener?.onPageLoadingChanged(false, _loadingView)
@@ -143,7 +274,7 @@ internal class StateView @JvmOverloads constructor(
         _pageChangeListener?.onPageErrorChanged(true, _errorView)
     }
 
-    fun showCustom() {
+    private fun showCustomPage() {
         if (!_hasCustom || isShowing(_customView)) return
         if (hide(_loadingView)) {
             _pageChangeListener?.onPageLoadingChanged(false, _loadingView)
@@ -158,22 +289,6 @@ internal class StateView @JvmOverloads constructor(
             show(_customView)
         }
         _pageChangeListener?.onPageCustomChanged(true, _customView)
-    }
-
-    fun setPageCreateListener(listener: PageCreateListener.() -> Unit) {
-        val pageCreatedListener = PageCreateListener()
-        pageCreatedListener.listener()
-        _pageCreateListener = pageCreatedListener
-    }
-
-    fun setPageChangeListener(listener: PageChangeListener.() -> Unit) {
-        val pageChangeListener = PageChangeListener()
-        pageChangeListener.listener()
-        _pageChangeListener = pageChangeListener
-    }
-
-    fun setReloadListener(listener: () -> Unit) {
-        _reloadListener = listener
     }
 
     override fun onClick(v: View?) {
@@ -232,6 +347,9 @@ internal class StateView @JvmOverloads constructor(
                 } else {
                     false
                 }
+            }
+            else -> {
+                return false
             }
         }
     }
@@ -296,10 +414,13 @@ internal class StateView @JvmOverloads constructor(
         return view
     }
 
+    private fun removeCallbacks() {
+        removeCallbacks(delayedShowLoading)
+        removeCallbacks(delayedShowOther)
+    }
+
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
-        _pageChangeListener = null
-        _pageCreateListener = null
-        _reloadListener = null
+        removeCallbacks()
     }
 }

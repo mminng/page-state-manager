@@ -6,6 +6,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.airbnb.lottie.LottieAnimationView
 import com.github.mminng.pagestate.PageStateManager
 import com.simple.pagestatemanager.R
 
@@ -23,7 +24,17 @@ class LottieActivity : AppCompatActivity() {
             actionBar.setDisplayHomeAsUpEnabled(true)
         }
         pageManager = PageStateManager.Builder(this)
-            .setLoadingLayout(R.layout.page_state_loading)
+            .setPageChangeListener {
+                pageLoadingChanged { visible, view ->
+                    val lottie: LottieAnimationView = view.findViewById(R.id.lottie_animation_view)
+                    if (visible) {
+                        lottie.playAnimation()
+                    } else {
+                        lottie.cancelAnimation()
+                    }
+                }
+            }
+            .setLoadingLayout(R.layout.lottie_state_loading)
             .setEmptyLayout(
                 layoutId = R.layout.page_state_empty,
                 iconId = R.id.state_empty_icon,
@@ -53,7 +64,7 @@ class LottieActivity : AppCompatActivity() {
                 2 -> pageManager.showEmpty()
                 3 -> pageManager.showError()
             }
-        }, 3000)
+        }, 5000)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

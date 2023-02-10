@@ -2,9 +2,6 @@ package com.github.mminng.pagestate.listener
 
 import android.view.View
 
-/**
- * Created by zh on 2023/1/10.
- */
 class PageChangeListener : OnPageChangeListener {
 
     private var _pageLoadingChanged: ((visible: Boolean, view: View) -> Unit)? = null
@@ -45,7 +42,7 @@ class PageChangeListener : OnPageChangeListener {
     }
 }
 
-interface OnPageChangeListener {
+internal interface OnPageChangeListener {
 
     fun onPageLoadingChanged(visible: Boolean, view: View?)
 
