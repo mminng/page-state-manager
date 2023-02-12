@@ -23,10 +23,10 @@
                 android:name="android.app.lib_name"
                 android:value="" />
         </activity>
-        <activity android:name="com.simple.pagestatemanager.defaultpage.activity.DefaultActivity" />
-        <activity android:name="com.simple.pagestatemanager.defaultpage.fragment.DefaultFragmentActivity" />
-        <activity android:name="com.simple.pagestatemanager.defaultpage.view.DefaultViewActivity" />
-        <activity android:name="com.simple.pagestatemanager.defaultpage.lottie.LottieActivity" />
+        <activity android:name="com.simple.pagestatemanager.activity.DefaultActivity" />
+        <activity android:name="com.simple.pagestatemanager.fragment.DefaultFragmentActivity" />
+        <activity android:name="com.simple.pagestatemanager.view.DefaultViewActivity" />
+        <activity android:name="com.simple.pagestatemanager.lottie.LottieActivity" />
 
     </application>
 

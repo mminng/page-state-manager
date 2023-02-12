@@ -1,4 +1,4 @@
-package com.simple.pagestatemanager.defaultpage.fragment
+package com.simple.pagestatemanager.fragment
 
 import android.os.Bundle
 import android.os.Handler

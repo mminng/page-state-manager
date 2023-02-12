@@ -4,10 +4,10 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
-import com.simple.pagestatemanager.defaultpage.activity.DefaultActivity
-import com.simple.pagestatemanager.defaultpage.fragment.DefaultFragmentActivity
-import com.simple.pagestatemanager.defaultpage.lottie.LottieActivity
-import com.simple.pagestatemanager.defaultpage.view.DefaultViewActivity
+import com.simple.pagestatemanager.activity.DefaultActivity
+import com.simple.pagestatemanager.fragment.DefaultFragmentActivity
+import com.simple.pagestatemanager.lottie.LottieActivity
+import com.simple.pagestatemanager.view.DefaultViewActivity
 
 /**
  * Created by zh on 2023/1/15.

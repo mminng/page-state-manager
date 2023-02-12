@@ -1,4 +1,4 @@
-package com.simple.pagestatemanager.defaultpage.lottie
+package com.simple.pagestatemanager.lottie
 
 import android.os.Bundle
 import android.os.Handler
@@ -26,26 +26,37 @@ class LottieActivity : AppCompatActivity() {
         pageManager = PageStateManager.Builder(this)
             .setPageChangeListener {
                 pageLoadingChanged { visible, view ->
-                    val lottie: LottieAnimationView = view.findViewById(R.id.lottie_animation_view)
+                    val lottie: LottieAnimationView = view.findViewById(R.id.lottie_loading_view)
                     if (visible) {
                         lottie.playAnimation()
                     } else {
                         lottie.cancelAnimation()
                     }
                 }
-            }
-            .setLoadingLayout(R.layout.lottie_state_loading)
+                pageEmptyChanged { visible, view ->
+                    val lottie: LottieAnimationView = view.findViewById(R.id.lottie_empty_view)
+                    if (visible) {
+                        lottie.playAnimation()
+                    } else {
+                        lottie.cancelAnimation()
+                    }
+                }
+                pageErrorChanged { visible, view ->
+                    val lottie: LottieAnimationView = view.findViewById(R.id.lottie_error_view)
+                    if (visible) {
+                        lottie.playAnimation()
+                    } else {
+                        lottie.cancelAnimation()
+                    }
+                }
+            }.setLoadingLayout(R.layout.lottie_state_loading)
             .setEmptyLayout(
-                layoutId = R.layout.page_state_empty,
-                iconId = R.id.state_empty_icon,
-                textId = R.id.state_empty_text,
-                clickId = R.id.state_empty_btn
+                layoutId = R.layout.lottie_state_empty,
+                clickId = R.id.lottie_empty_btn
             )
             .setErrorLayout(
-                layoutId = R.layout.page_state_error,
-                iconId = R.id.state_error_icon,
-                textId = R.id.state_error_text,
-                clickId = R.id.state_error_btn
+                layoutId = R.layout.lottie_state_error,
+                clickId = R.id.lottie_error_btn
             ).build()
         pageManager.setReloadListener {
             load((1..3).random())
@@ -64,7 +75,7 @@ class LottieActivity : AppCompatActivity() {
                 2 -> pageManager.showEmpty()
                 3 -> pageManager.showError()
             }
-        }, 5000)
+        }, 3000)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -86,14 +97,6 @@ class LottieActivity : AppCompatActivity() {
                 showToast()
                 pageManager.showError()
             }
-            R.id.empty_change -> {
-                showToast()
-                pageManager.showEmpty("Okay...", R.drawable.ic_empty)
-            }
-            R.id.error_change -> {
-                showToast()
-                pageManager.showError("Oh no!", R.drawable.ic_error)
-            }
             android.R.id.home -> finish()
             else -> {}
         }
@@ -101,7 +104,7 @@ class LottieActivity : AppCompatActivity() {
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.menu_page_state, menu)
+        menuInflater.inflate(R.menu.menu_lottie_page_state, menu)
         return super.onCreateOptionsMenu(menu)
     }
 

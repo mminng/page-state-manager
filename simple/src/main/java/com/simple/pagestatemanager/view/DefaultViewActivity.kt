@@ -1,4 +1,4 @@
-package com.simple.pagestatemanager.defaultpage.view
+package com.simple.pagestatemanager.view
 
 import android.os.Bundle
 import android.os.Handler

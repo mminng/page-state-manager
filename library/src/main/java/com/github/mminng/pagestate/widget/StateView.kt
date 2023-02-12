@@ -2,7 +2,6 @@ package com.github.mminng.pagestate.widget
 
 import android.content.Context
 import android.util.AttributeSet
-import android.util.Log
 import android.util.SparseArray
 import android.view.View
 import android.view.View.OnClickListener
@@ -18,7 +17,6 @@ import com.github.mminng.pagestate.listener.PageChangeListener
 import com.github.mminng.pagestate.listener.PageCreateListener
 import com.github.mminng.pagestate.state.State
 
-private const val MIN_SHOW_MS: Long = 500
 private const val MIN_DELAY_MS: Long = 500
 
 internal class StateView @JvmOverloads constructor(
@@ -67,7 +65,7 @@ internal class StateView @JvmOverloads constructor(
     fun setContentView(
         contentView: View,
         rootView: ViewGroup,
-        index: Int,
+        contentIndex: Int,
         isFragment: Boolean
     ) {
         if (isFragment) {
@@ -77,7 +75,7 @@ internal class StateView @JvmOverloads constructor(
         }
         _contentView = contentView
         _rootView = rootView
-        _contentIndex = index
+        _contentIndex = contentIndex
         _isFragment = isFragment
     }
 
@@ -112,7 +110,7 @@ internal class StateView @JvmOverloads constructor(
         addView(errorViewStub)
     }
 
-    fun setCustomLayout(
+    fun setCustomView(
         @LayoutRes layoutId: Int,
         @IdRes reloadClickId: Int = 0
     ) {
@@ -126,33 +124,26 @@ internal class StateView @JvmOverloads constructor(
 
     fun showLoading() {
         if (isShowing(_loadingView)) return
-        if (hide(_emptyView)) {
-            _pageChangeListener?.onPageEmptyChanged(false, _emptyView)
-        }
-        if (hide(_errorView)) {
-            _pageChangeListener?.onPageErrorChanged(false, _errorView)
-        }
-        if (_hasCustom && hide(_customView)) {
-            _pageChangeListener?.onPageCustomChanged(false, _customView)
-        }
-        removeCallbacks()
-        postDelayed(delayedShowLoading, MIN_DELAY_MS)
+        showStatePage(State.LOADING)
     }
 
     fun showContent() {
-        showOther(State.CONTENT)
+        showStatePage(State.CONTENT)
     }
 
     fun showEmpty(message: String, @DrawableRes iconResId: Int) {
-        showOther(State.EMPTY, message, iconResId)
+        if (isShowing(_emptyView)) return
+        showStatePage(State.EMPTY, message, iconResId)
     }
 
     fun showError(message: String, @DrawableRes iconResId: Int) {
-        showOther(State.ERROR, message, iconResId)
+        if (isShowing(_errorView)) return
+        showStatePage(State.ERROR, message, iconResId)
     }
 
     fun showCustom() {
-        showOther(State.CUSTOM)
+        if (!_hasCustom || isShowing(_customView)) return
+        showStatePage(State.CUSTOM)
     }
 
     fun setPageCreateListener(listener: PageCreateListener.() -> Unit) {
@@ -171,7 +162,7 @@ internal class StateView @JvmOverloads constructor(
         _reloadListener = listener
     }
 
-    private fun showOther(
+    private fun showStatePage(
         state: State,
         message: String = "",
         @DrawableRes iconResId: Int = 0
@@ -180,11 +171,24 @@ internal class StateView @JvmOverloads constructor(
         _currentState = state
         _currentMessage = message
         _currentIconResId = iconResId
-        val diff: Long = System.currentTimeMillis() - _startTime
-        if (diff >= MIN_SHOW_MS || _startTime == -1L) {
-            showOtherPage()
+        if (state == State.LOADING) {
+            if (hide(_emptyView)) {
+                _pageChangeListener?.onPageEmptyChanged(false, _emptyView)
+            }
+            if (hide(_errorView)) {
+                _pageChangeListener?.onPageErrorChanged(false, _errorView)
+            }
+            if (_hasCustom && hide(_customView)) {
+                _pageChangeListener?.onPageCustomChanged(false, _customView)
+            }
+            postDelayed(delayedShowLoading, MIN_DELAY_MS)
         } else {
-            postDelayed(delayedShowOther, MIN_SHOW_MS - diff)
+            val diff: Long = System.currentTimeMillis() - _startTime
+            if (diff >= MIN_DELAY_MS || _startTime == -1L) {
+                showOtherPage()
+            } else {
+                postDelayed(delayedShowOther, MIN_DELAY_MS - diff)
+            }
         }
     }
 
@@ -239,7 +243,6 @@ internal class StateView @JvmOverloads constructor(
     }
 
     private fun showEmptyPage(message: String, @DrawableRes iconResId: Int) {
-        if (isShowing(_emptyView)) return
         if (hide(_loadingView)) {
             _pageChangeListener?.onPageLoadingChanged(false, _loadingView)
         }
@@ -257,7 +260,6 @@ internal class StateView @JvmOverloads constructor(
     }
 
     private fun showErrorPage(message: String, @DrawableRes iconResId: Int) {
-        if (isShowing(_errorView)) return
         if (hide(_loadingView)) {
             _pageChangeListener?.onPageLoadingChanged(false, _loadingView)
         }
@@ -275,7 +277,6 @@ internal class StateView @JvmOverloads constructor(
     }
 
     private fun showCustomPage() {
-        if (!_hasCustom || isShowing(_customView)) return
         if (hide(_loadingView)) {
             _pageChangeListener?.onPageLoadingChanged(false, _loadingView)
         }
