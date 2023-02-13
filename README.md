@@ -25,17 +25,17 @@ val pageManager = PageStateManager.Builder(target = Activity or Fragment or View
             .setLoadingLayout(loading layout)
             .setEmptyLayout(
                 layoutId = empty layout,
-                iconId = icon view Id/*support ImageView only*/,
-                textId = message view Id/*support TextView only*/,
-                clickId = reload click view Id
+                iconId = icon view id/*support ImageView only*/,
+                textId = message view id/*support TextView only*/,
+                clickId = reload click view id
             ).setErrorLayout(
                 layoutId = error layout,
-                iconId = icon view Id/*support ImageView only*/,
-                textId = message view Id/*support TextView only*/,
-                clickId = reload click view Id
+                iconId = icon view id/*support ImageView only*/,
+                textId = message view id/*support TextView only*/,
+                clickId = reload click view id
             ).setCustomLayout(
                 layoutId = custom layout,
-                clickId = reload click view Id
+                clickId = reload click view id
             ).setPageCreateListener {
                 pageLoadingCreated { view ->
                     //Loading view created
