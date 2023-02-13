@@ -24,8 +24,8 @@ class PageStateManager constructor(builder: Builder) {
         val isFragment: Boolean = builder.target is Fragment
         _stateView = StateView(rootView.context)
         _stateView.background = contentView.background
-        _stateView.setLoadingView(builder.loadingLayout)
         _stateView.setContentView(contentView, rootView, index, isFragment)
+        _stateView.setLoadingView(builder.loadingLayout)
         _stateView.setEmptyView(
             builder.emptyLayout,
             builder.emptyIconId,

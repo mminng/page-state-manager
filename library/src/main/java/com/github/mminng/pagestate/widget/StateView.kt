@@ -122,13 +122,13 @@ internal class StateView @JvmOverloads constructor(
         }
     }
 
+    fun showContent() {
+        showStatePage(State.CONTENT)
+    }
+
     fun showLoading() {
         if (isShowing(_loadingView)) return
         showStatePage(State.LOADING)
-    }
-
-    fun showContent() {
-        showStatePage(State.CONTENT)
     }
 
     fun showEmpty(message: String, @DrawableRes iconResId: Int) {
