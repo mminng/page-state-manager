@@ -21,7 +21,7 @@ dependencies {
 ```
 ### Simple
 ```Kotlin
-val pageManager: PageStateManager = PageStateManager.Builder(target = Activity or Fragment or View)
+val pageManager = PageStateManager.Builder(target = Activity or Fragment or View)
             .setLoadingLayout(loading layout)
             .setEmptyLayout(
                 layoutId = empty layout,
