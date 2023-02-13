@@ -1,6 +1,6 @@
 # PageStateManager
 A PageStateManager for Android.
-# Screenshots
+# Screenshot
 ![screenshot](https://raw.githubusercontent.com/mminng/PageStateManager/master/screenshots/Screenshot_1.png)
 # Getting Started
 **Step 1.** Add it in your root build.gradle at the end of repositories:
@@ -15,6 +15,7 @@ allprojects {
 **Step 2.** Add the dependency:
 ```Groovy
 dependencies {
+    ...
     implementation 'com.github.mminng:PageStateManager:1.0.0'
 }
 ```
