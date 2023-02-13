@@ -19,7 +19,7 @@ dependencies {
     implementation 'com.github.mminng:PageStateManager:1.0.0'
 }
 ```
-### Simple
+# Simple
 ```Kotlin
 val pageManager = PageStateManager.Builder(target = Activity or Fragment or View)
             .setLoadingLayout(loading layout)
