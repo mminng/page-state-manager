@@ -1,4 +1,4 @@
-# PageStateManager
+# PageStateManager [![](https://jitpack.io/v/mminng/page-state-manager.svg)](https://jitpack.io/#mminng/page-state-manager)
 A PageStateManager for Android.
 # Screenshot
 ![screenshot](https://raw.githubusercontent.com/mminng/PageStateManager/master/screenshots/Screenshot_1.png)
@@ -16,7 +16,7 @@ allprojects {
 ```Groovy
 dependencies {
     ...
-    implementation 'com.github.mminng:PageStateManager:1.0.0'
+    implementation 'com.github.mminng:page-state-manager:1.0.0'
 }
 ```
 # Simple
