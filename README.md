@@ -16,7 +16,7 @@ allprojects {
 ```Groovy
 dependencies {
     ...
-    implementation 'com.github.mminng:page-state-manager:1.0.0'
+    implementation 'com.github.mminng:page-state-manager:1.0.1'
 }
 ```
 # Simple
