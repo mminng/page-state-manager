@@ -1,7 +1,7 @@
 # PageStateManager [![](https://jitpack.io/v/mminng/page-state-manager.svg)](https://jitpack.io/#mminng/page-state-manager)
 A PageStateManager for Android.
 # Screenshot
-![screenshot](https://github.com/mminng/item-visibility-helper/blob/master/screenshots/Screenshot_1.png)
+![screenshot](https://github.com/mminng/page-state-manager/blob/master/screenshots/Screenshot_1.png)
 # Getting Started
 **Step 1.** Add it in your root build.gradle at the end of repositories:
 ```Groovy
