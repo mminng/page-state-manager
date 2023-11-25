@@ -82,9 +82,15 @@ class PageStateManager constructor(builder: Builder) {
             is Activity -> {
                 target.findViewById(Window.ID_ANDROID_CONTENT)
             }
+
             is Fragment -> {
-                target.requireView().parent as ViewGroup
+                if (target.requireView().parent != null) {
+                    target.requireView().parent as ViewGroup
+                } else {
+                    throw IllegalArgumentException("The parent this Fragment can't null.")
+                }
             }
+
             is View -> {
                 if (target.parent != null) {
                     target.parent as ViewGroup
@@ -92,6 +98,7 @@ class PageStateManager constructor(builder: Builder) {
                     throw IllegalArgumentException("The parent this view can't null.")
                 }
             }
+
             else -> throw IllegalArgumentException("The target type must be Fragment or Activity or View.")
         }
 
